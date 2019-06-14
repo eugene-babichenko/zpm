@@ -15,6 +15,7 @@ type Config struct {
 }
 
 var filePluginRegex = regexp.MustCompile(`file:(.*)`)
+var dirPluginRegex = regexp.MustCompile(`dir:(.*)`)
 
 func (c Config) GetPlugins() ([]plugin.Plugin, error) {
 	plugins := make([]plugin.Plugin, 0, len(c.Plugins))
@@ -24,6 +25,13 @@ func (c Config) GetPlugins() ([]plugin.Plugin, error) {
 		if len(submatch) > 0 {
 			filename := submatch[1]
 			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "plugins", filename)})
+			continue
+		}
+
+		submatch = dirPluginRegex.FindStringSubmatch(pluginSpec)
+		if len(submatch) > 0 {
+			filename := submatch[1]
+			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "plugins", filename)})
 			continue
 		}
 
