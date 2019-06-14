@@ -1,9 +1,7 @@
 package main
 
-import (
-	"fmt"
-)
+import "zpm/cmd"
 
 func main() {
-	fmt.Println("Hello, world!")
+	cmd.Execute()
 }
