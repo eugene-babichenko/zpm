@@ -11,8 +11,13 @@ type File struct {
 }
 
 func (p File) Load() ([]string, error) {
-	if _, err := os.Stat(p.Path); err != nil {
+	stat, err := os.Stat(p.Path)
+	if err != nil {
 		return nil, errors.Wrap(err, "while loading file plugin")
+	}
+
+	if stat.Mode()&os.ModeType != 0 {
+		return nil, errors.New("the provided path is not a file: " + p.Path)
 	}
 
 	s := make([]string, 1)
