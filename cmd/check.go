@@ -23,7 +23,7 @@ var checkCmd = &cobra.Command{
 				continue
 			}
 			if update != nil {
-				fmt.Printf("%s: %s", appConfig.Plugins[idx], update)
+				fmt.Printf("%s: %s", appConfig.Plugins[idx], *update)
 			}
 		}
 	},

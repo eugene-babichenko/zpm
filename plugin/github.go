@@ -105,19 +105,15 @@ func (p *GitHub) clone() error {
 }
 
 func (p *GitHub) CheckUpdate() (*string, error) {
-	var repo *git.Repository
-
 	if p.dir == nil {
-		return nil, NotInstalledError
-	} else {
-		repoLocal, err := git.PlainOpen(p.dir.Path)
-		if err != nil {
-			return nil, err
-		}
-		repo = repoLocal
+		return nil, NotInstalled
 	}
 
-	var currentVersion plumbing.Hash
+	repo, err := git.PlainOpen(p.dir.Path)
+	if err != nil {
+		return nil, err
+	}
+
 	currentHead, err := repo.Head()
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot read chain head")
@@ -125,7 +121,8 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 	if currentHead == nil {
 		return nil, errors.New("cannot read chain head")
 	}
-	currentVersion = currentHead.Hash()
+
+	currentVersion := currentHead.Hash()
 
 	fetchOptions := git.FetchOptions{}
 	if err := fetchOptions.Validate(); err != nil {

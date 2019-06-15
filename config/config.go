@@ -22,24 +22,22 @@ func (c Config) GetPlugins() ([]plugin.Plugin, error) {
 	plugins := make([]plugin.Plugin, 0, len(c.Plugins))
 
 	for _, pluginSpec := range c.Plugins {
-		submatch := filePluginRegex.FindStringSubmatch(pluginSpec)
-		if len(submatch) > 0 {
+		if submatch := filePluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			filename := submatch[1]
 			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "plugins", filename)})
 			continue
 		}
 
-		submatch = dirPluginRegex.FindStringSubmatch(pluginSpec)
-		if len(submatch) > 0 {
+		if submatch := dirPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			filename := submatch[1]
 			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "plugins", filename)})
 			continue
 		}
 
-		submatch = githubPluginRegex.FindStringSubmatch(pluginSpec)
-		if len(submatch) > 0 {
+		if submatch := githubPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			username := submatch[1]
 			repositoryName := submatch[2]
+
 			githubPlugin, err := plugin.NewGitHub(username, repositoryName, "branch", "master", c.Root)
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to open a repository")

@@ -2,10 +2,10 @@ package plugin
 
 import "github.com/pkg/errors"
 
-var NotInstalledError = errors.New("not installed")
+var NotInstalled = errors.New("not installed")
 
 func IsNotInstalled(err error) bool {
-	return err == NotInstalledError
+	return err == NotInstalled
 }
 
 type Plugin interface {

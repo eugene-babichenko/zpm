@@ -37,8 +37,7 @@ func (p Dir) Load() ([]string, error) {
 	entrypoints = append(entrypoints, themes...)
 
 	for _, entrypoint := range entrypoints {
-		stat, err = os.Stat(entrypoint)
-		if err == nil {
+		if stat, err = os.Stat(entrypoint); err == nil {
 			if stat.Mode()&os.ModeType == 0 {
 				s = append(s, fmt.Sprintf("source %s", entrypoint))
 			}
