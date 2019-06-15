@@ -14,6 +14,11 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Install updates and download missing plugins",
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("invalidating cache...")
+		if err := os.RemoveAll(cachePath); err != nil {
+			fmt.Println("error invalidating cache:", err.Error())
+		}
+
 		plugins, err := appConfig.GetPlugins()
 		if err != nil {
 			fmt.Printf("error: %s\n", err.Error())
@@ -26,6 +31,7 @@ var updateCmd = &cobra.Command{
 		for idx, pluginInstance := range plugins {
 			go func(idx int, pluginInstance plugin.Plugin) {
 				if update, err := pluginInstance.CheckUpdate(); plugin.IsNotInstalled(err) {
+					fmt.Printf("%s: installing...\n", appConfig.Plugins[idx])
 					if err := pluginInstance.InstallUpdate(); err != nil {
 						fmt.Printf("%s: installation error: %s\n", appConfig.Plugins[idx], err.Error())
 					}

@@ -14,8 +14,8 @@ import (
 )
 
 var appConfigFile string
-
 var appConfig config.Config
+var cachePath string
 
 var RootCmd = &cobra.Command{
 	Use:   "zpm [command]",
@@ -65,4 +65,6 @@ func initConfig() {
 	if len(appConfig.Root) == 0 {
 		appConfig.Root = filepath.Join(home, ".zpm")
 	}
+
+	cachePath = filepath.Join(appConfig.Root, "cache.zsh")
 }
