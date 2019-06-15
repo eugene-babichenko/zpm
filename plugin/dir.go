@@ -47,3 +47,11 @@ func (p Dir) Load() ([]string, error) {
 
 	return s, nil
 }
+
+func (p Dir) CheckUpdate() (*string, error) {
+	return nil, nil
+}
+
+func (p Dir) InstallUpdate() error {
+	return nil
+}

@@ -25,3 +25,11 @@ func (p File) Load() ([]string, error) {
 
 	return s, nil
 }
+
+func (p File) CheckUpdate() (*string, error) {
+	return nil, nil
+}
+
+func (p File) InstallUpdate() error {
+	return nil
+}
