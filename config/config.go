@@ -16,6 +16,7 @@ type Config struct {
 
 var filePluginRegex = regexp.MustCompile(`file:(.*)`)
 var dirPluginRegex = regexp.MustCompile(`dir:(.*)`)
+var githubPluginRegex = regexp.MustCompile(`github:([a-z0-9\-]+)/([a-z0-9\-]+)`)
 
 func (c Config) GetPlugins() ([]plugin.Plugin, error) {
 	plugins := make([]plugin.Plugin, 0, len(c.Plugins))
@@ -32,6 +33,18 @@ func (c Config) GetPlugins() ([]plugin.Plugin, error) {
 		if len(submatch) > 0 {
 			filename := submatch[1]
 			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "plugins", filename)})
+			continue
+		}
+
+		submatch = githubPluginRegex.FindStringSubmatch(pluginSpec)
+		if len(submatch) > 0 {
+			username := submatch[1]
+			repositoryName := submatch[2]
+			githubPlugin, err := plugin.NewGitHub(username, repositoryName, "branch", "master", c.Root)
+			if err != nil {
+				return nil, errors.Wrap(err, "failed to open a repository")
+			}
+			plugins = append(plugins, githubPlugin)
 			continue
 		}
 
