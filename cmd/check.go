@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"zpm/plugin"
+
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/spf13/cobra"
 )
@@ -16,16 +19,25 @@ var checkCmd = &cobra.Command{
 			fmt.Printf("%s", err.Error())
 			os.Exit(1)
 		}
-		for idx, plugin := range plugins {
-			update, err := plugin.CheckUpdate()
-			if err != nil {
-				fmt.Printf("%s: %s", appConfig.Plugins[idx], err.Error())
-				continue
-			}
-			if update != nil {
-				fmt.Printf("%s: %s", appConfig.Plugins[idx], *update)
-			}
+
+		waitGroup := sync.WaitGroup{}
+		waitGroup.Add(len(plugins))
+
+		for idx, pluginInstance := range plugins {
+			go func(idx int, pluginInstance plugin.Plugin) {
+				if update, err := pluginInstance.CheckUpdate(); err != nil {
+					fmt.Printf("%s: error: %s\n", appConfig.Plugins[idx], err.Error())
+				} else if update != nil {
+					fmt.Printf("%s: %s\n", appConfig.Plugins[idx], *update)
+				} else {
+					fmt.Printf("%s: up to date\n", appConfig.Plugins[idx])
+				}
+
+				waitGroup.Done()
+			}(idx, pluginInstance)
 		}
+
+		waitGroup.Wait()
 	},
 }
 
