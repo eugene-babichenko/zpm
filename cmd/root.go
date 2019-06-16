@@ -5,17 +5,23 @@ import (
 
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var appConfigFile string
 var appConfig config.Config
 var cachePath string
+
+var logger *zap.SugaredLogger
 
 var RootCmd = &cobra.Command{
 	Use:   "zpm [command]",
@@ -67,4 +73,34 @@ func initConfig() {
 	}
 
 	cachePath = filepath.Join(appConfig.Root, "cache.zsh")
+
+	var level zapcore.Level
+	switch appConfig.Logger.Level {
+	case "debug":
+		level = zap.DebugLevel
+	case "info":
+		level = zap.InfoLevel
+	case "error":
+		level = zap.ErrorLevel
+	case "fatal":
+		level = zap.FatalLevel
+	default:
+		level = zap.InfoLevel
+	}
+
+	fileLogger := &lumberjack.Logger{
+		Filename:   filepath.Join(appConfig.Root, "Logs", "zpm.log"),
+		MaxSize:    appConfig.Logger.MaxSize,
+		MaxAge:     appConfig.Logger.MaxAge,
+		MaxBackups: appConfig.Logger.MaxBackups,
+		LocalTime:  true,
+		Compress:   false,
+	}
+	core := zapcore.NewCore(
+		zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+		zapcore.AddSync(io.MultiWriter(os.Stdout, fileLogger)),
+		level,
+	)
+
+	logger = zap.New(core).Sugar()
 }

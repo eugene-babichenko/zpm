@@ -1,7 +1,7 @@
 * [ ] Logging
-  * [ ] Sane log format
+  * [x] Sane log format
   * [ ] Logs in the terminal when loading
-  * [ ] Log files
+  * [x] Log files
 * [ ] Cache: handle software updates
   * [ ] Own cache
   * [ ] Completion cache

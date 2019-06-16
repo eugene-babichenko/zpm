@@ -3,7 +3,6 @@ package cmd
 import (
 	"zpm/plugin"
 
-	"fmt"
 	"os"
 	"sync"
 
@@ -16,7 +15,7 @@ var checkCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		names, plugins, err := appConfig.GetPlugins()
 		if err != nil {
-			fmt.Printf("%s", err.Error())
+			logger.Fatal("while reading plugin configurations: ", err.Error())
 			os.Exit(1)
 		}
 
@@ -25,12 +24,14 @@ var checkCmd = &cobra.Command{
 
 		for idx, pluginInstance := range plugins {
 			go func(idx int, pluginInstance plugin.Plugin) {
-				if update, err := pluginInstance.CheckUpdate(); err != nil {
-					fmt.Printf("%s: error: %s\n", names[idx], err.Error())
+				if update, err := pluginInstance.CheckUpdate(); plugin.IsNotInstalled(err) {
+					logger.Info("not installed: ", names[idx])
+				} else if err != nil {
+					logger.Errorf("while checking for %s: %s", names[idx], err.Error())
 				} else if update != nil {
-					fmt.Printf("%s: %s\n", names[idx], *update)
+					logger.Infof("update available for %s: %s", names[idx], *update)
 				} else {
-					fmt.Printf("%s: up to date\n", names[idx])
+					logger.Info("up to date: ", names[idx])
 				}
 
 				waitGroup.Done()
