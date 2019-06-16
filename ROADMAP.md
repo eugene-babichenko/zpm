@@ -13,7 +13,7 @@
   * [ ] Allow to set check period (1 hour, 1 day, etc)
   * [ ] Async check: load shell immediately, check in the background and show a system notification
 * [ ] Settings
-  * [ ] Use `$HOME/Library` instead of `$HOME` by default on macOS
+  * [x] Use `$HOME/Library` instead of `$HOME` by default on macOS
   * [ ] Allow to specify a package version (branch, tag, git commit)
 * [ ] Plugin management CLI (CRUD)
 * [ ] Allow loading plugins without installing them

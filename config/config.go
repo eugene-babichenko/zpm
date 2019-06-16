@@ -49,11 +49,11 @@ func (c Config) GetPlugins() (names []string, plugins []plugin.Plugin, err error
 	for _, pluginSpec := range c.Plugins {
 		if submatch := filePluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			filename := submatch[1]
-			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "plugins", filename)})
+			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "Plugins", filename)})
 			names = append(names, pluginSpec)
 		} else if submatch := dirPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			filename := submatch[1]
-			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "plugins", filename)})
+			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "Plugins", filename)})
 			names = append(names, pluginSpec)
 		} else if submatch := githubPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			username := submatch[1]

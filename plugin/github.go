@@ -30,7 +30,7 @@ func NewGitHub(
 ) (*GitHub, error) {
 	var dir *Dir
 
-	path := filepath.Join(root, "plugins", "github.com", username, repository)
+	path := filepath.Join(root, "Plugins", "github.com", username, repository)
 	stat, err := os.Stat(path)
 	if err != nil && !os.IsNotExist(err) {
 		return nil, errors.Wrap(err, "while creating github plugin object")
@@ -75,12 +75,12 @@ func (p *GitHub) referenceName() *plumbing.ReferenceName {
 }
 
 func (p *GitHub) clone() error {
-	parentPath := filepath.Join(p.root, "plugins", "github.com", p.username)
+	parentPath := filepath.Join(p.root, "Plugins", "github.com", p.username)
 	if err := os.MkdirAll(parentPath, os.ModePerm); err != nil && !os.IsExist(err) {
 		return errors.Wrap(err, "while creating github plugin object")
 	}
 
-	path := filepath.Join(p.root, "plugins", "github.com", p.username, p.repositoryName)
+	path := filepath.Join(p.root, "Plugins", "github.com", p.username, p.repositoryName)
 
 	repositoryURL := fmt.Sprintf("https://github.com/%s/%s.git", p.username, p.repositoryName)
 

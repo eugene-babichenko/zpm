@@ -19,7 +19,7 @@ func NewOhMyZsh(root string) (*OhMyZsh, error) {
 	}
 
 	ohMyZsh := &OhMyZsh{
-		root:   filepath.Join(root, "plugins", "github.com", "robbyrussell", "oh-my-zsh"),
+		root:   filepath.Join(root, "Plugins", "github.com", "robbyrussell", "oh-my-zsh"),
 		github: github,
 	}
 
