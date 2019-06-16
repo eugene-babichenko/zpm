@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -35,20 +36,30 @@ var versionCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		lines := make([]string, 0)
+		fpath := make([]string, 0)
+		exec := make([]string, 0)
 
-		lines = append(lines, "autoload -U compaudit compinit")
+		lines := []string{"autoload -U compaudit compinit"}
 
 		for _, plugin := range plugins {
-			linesPlugin, err := plugin.Load()
+			fpathPlugin, execPlugin, err := plugin.Load()
 			if err != nil {
 				fmt.Println("# error loading plugin:", err.Error())
 				continue
 			}
-			lines = append(lines, linesPlugin...)
+			fpath = append(fpath, fpathPlugin...)
+			exec = append(exec, execPlugin...)
 		}
 
-		lines = append(lines, "compinit -u -C")
+		var fpathBuilder strings.Builder
+		_, _ = fmt.Fprint(&fpathBuilder, "fpath=(")
+		for _, fpathEntry := range fpath {
+			_, _ = fmt.Fprintf(&fpathBuilder, "%s ", fpathEntry)
+		}
+		_, _ = fmt.Fprint(&fpathBuilder, "$fpath)")
+
+		lines = append(lines, fpathBuilder.String(), "compinit -u -C")
+		lines = append(lines, exec...)
 
 		for _, line := range lines {
 			fmt.Println(line)

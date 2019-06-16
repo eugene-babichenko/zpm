@@ -53,9 +53,9 @@ func NewGitHub(
 	return &ret, nil
 }
 
-func (p *GitHub) Load() ([]string, error) {
+func (p *GitHub) Load() ([]string, []string, error) {
 	if p.Dir == nil {
-		return nil, errors.New("plugin is not present on the drive")
+		return nil, nil, errors.New("plugin is not present on the drive")
 	}
 	return p.Dir.Load()
 }

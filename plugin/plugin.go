@@ -9,7 +9,7 @@ func IsNotInstalled(err error) bool {
 }
 
 type Plugin interface {
-	Load() ([]string, error)
-	CheckUpdate() (*string, error)
+	Load() (fpath []string, exec []string, err error)
+	CheckUpdate() (message *string, err error)
 	InstallUpdate() error
 }

@@ -26,10 +26,10 @@ func NewOhMyZsh(root string) (*OhMyZsh, error) {
 	return ohMyZsh, nil
 }
 
-func (p *OhMyZsh) Load() ([]string, error) {
-	lines, err := p.github.Load()
+func (p *OhMyZsh) Load() (fpath []string, exec []string, err error) {
+	fpath, exec, err = p.github.Load()
 	if err != nil {
-		return nil, errors.Wrap(err, "ohmyzsh")
+		return nil, nil, errors.Wrap(err, "ohmyzsh")
 	}
 
 	libraries := fmt.Sprintf(
@@ -37,9 +37,9 @@ func (p *OhMyZsh) Load() ([]string, error) {
 		p.github.Dir.Path,
 	)
 
-	lines = append(lines, "compinit -u -C", libraries)
+	exec = append(exec, libraries)
 
-	return lines, nil
+	return fpath, exec, nil
 }
 
 func (p *OhMyZsh) CheckUpdate() (*string, error) {

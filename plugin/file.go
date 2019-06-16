@@ -10,20 +10,19 @@ type File struct {
 	Path string
 }
 
-func (p File) Load() ([]string, error) {
+func (p File) Load() (fpath []string, exec []string, err error) {
 	stat, err := os.Stat(p.Path)
 	if err != nil {
-		return nil, errors.Wrap(err, "while loading file plugin")
+		return nil, nil, errors.Wrap(err, "while loading file plugin")
 	}
 
 	if stat.Mode()&os.ModeType != 0 {
-		return nil, errors.New("the provided path is not a file: " + p.Path)
+		return nil, nil, errors.New("the provided path is not a file: " + p.Path)
 	}
 
-	s := make([]string, 1)
-	s[0] = "source " + p.Path
+	exec = []string{"source " + p.Path}
 
-	return s, nil
+	return fpath, exec, err
 }
 
 func (p File) CheckUpdate() (*string, error) {
