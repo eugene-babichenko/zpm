@@ -5,7 +5,7 @@
 * [ ] Cache: handle software updates
   * [ ] Own cache
   * [ ] Completion cache
-* [ ] Allow to work w/o the cache
+* [x] Allow to work w/o the cache
 * [ ] Check for updates on load
   * [ ] Install new plugins
   * [ ] Prompt to install updates

@@ -8,7 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var noCache bool
+
 func loadCache() bool {
+	if noCache {
+		return false
+	}
+
 	stat, err := os.Stat(cachePath)
 	if err != nil {
 		fmt.Println("# error reading cache", err.Error())
@@ -65,6 +71,10 @@ var versionCmd = &cobra.Command{
 			fmt.Println(line)
 		}
 
+		if noCache {
+			return
+		}
+
 		cacheFile, err := os.Create(cachePath)
 		if err != nil {
 			fmt.Println("# cannot write cache:", err.Error())
@@ -81,5 +91,12 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
+	versionCmd.Flags().BoolVar(
+		&noCache,
+		"no-cache",
+		false,
+		"do not use and set cache when loading plugins",
+	)
+
 	RootCmd.AddCommand(versionCmd)
 }
