@@ -23,19 +23,10 @@ var checkCmd = &cobra.Command{
 		waitGroup.Add(len(plugins))
 
 		for idx, pluginInstance := range plugins {
-			go func(idx int, pluginInstance plugin.Plugin) {
-				if update, err := pluginInstance.CheckUpdate(); plugin.IsNotInstalled(err) {
-					logger.Info("not installed: ", names[idx])
-				} else if err != nil {
-					logger.Errorf("while checking for %s: %s", names[idx], err.Error())
-				} else if update != nil {
-					logger.Infof("update available for %s: %s", names[idx], *update)
-				} else {
-					logger.Info("up to date: ", names[idx])
-				}
-
+			go func(name string, pluginInstance plugin.Plugin) {
+				_, _ = checkPluginUpdate(name, pluginInstance)
 				waitGroup.Done()
-			}(idx, pluginInstance)
+			}(names[idx], pluginInstance)
 		}
 
 		waitGroup.Wait()

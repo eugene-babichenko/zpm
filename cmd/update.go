@@ -27,26 +27,25 @@ var updateCmd = &cobra.Command{
 		waitGroup.Add(len(plugins))
 
 		for idx, pluginInstance := range plugins {
-			go func(idx int, pluginInstance plugin.Plugin) {
-				if update, err := pluginInstance.CheckUpdate(); plugin.IsNotInstalled(err) {
-					logger.Info("installing: ", names[idx])
+			go func(name string, pluginInstance plugin.Plugin) {
+				update, err := checkPluginUpdate(name, pluginInstance)
+
+				if plugin.IsNotInstalled(err) {
+					logger.Info("installing: ", name)
 					if err := pluginInstance.InstallUpdate(); err != nil {
-						logger.Errorf("installation error for %s: %s", names[idx], err.Error())
+						logger.Errorf("installation error for %s: %s", name, err.Error())
 					}
-					logger.Info("installed: ", names[idx])
-				} else if err != nil {
-					logger.Errorf("while checking for %s: %s", names[idx], err.Error())
-				} else if update != nil {
-					logger.Infof("updating %s: %s", names[idx], *update)
+					logger.Info("installed: ", name)
+				} else if err == nil && update != nil {
+					logger.Infof("updating %s: %s", name, *update)
 					if err := pluginInstance.InstallUpdate(); err != nil {
-						logger.Errorf("while updating %s: %s", names[idx], err.Error())
+						logger.Errorf("while updating %s: %s", name, err.Error())
 					}
-					logger.Info("updated: ", names[idx])
-				} else {
-					logger.Info("up to date: ", names[idx])
+					logger.Info("updated: ", names)
 				}
+
 				waitGroup.Done()
-			}(idx, pluginInstance)
+			}(names[idx], pluginInstance)
 		}
 
 		waitGroup.Wait()
