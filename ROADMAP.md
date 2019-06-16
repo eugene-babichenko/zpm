@@ -18,5 +18,5 @@
 * [ ] Plugin management CLI (CRUD)
 * [ ] Allow loading plugins without installing them
 * [ ] Purge plugins directory
-* [ ] ZSH completions for the own command
+* [x] ZSH completions for the own command
 * [ ] Publish in binary repositories
