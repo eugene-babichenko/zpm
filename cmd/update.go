@@ -19,7 +19,7 @@ var updateCmd = &cobra.Command{
 			fmt.Println("error invalidating cache:", err.Error())
 		}
 
-		plugins, err := appConfig.GetPlugins()
+		names, plugins, err := appConfig.GetPlugins()
 		if err != nil {
 			fmt.Printf("error: %s\n", err.Error())
 			os.Exit(1)
@@ -31,19 +31,21 @@ var updateCmd = &cobra.Command{
 		for idx, pluginInstance := range plugins {
 			go func(idx int, pluginInstance plugin.Plugin) {
 				if update, err := pluginInstance.CheckUpdate(); plugin.IsNotInstalled(err) {
-					fmt.Printf("%s: installing...\n", appConfig.Plugins[idx])
+					fmt.Printf("%s: installing...\n", names[idx])
 					if err := pluginInstance.InstallUpdate(); err != nil {
-						fmt.Printf("%s: installation error: %s\n", appConfig.Plugins[idx], err.Error())
+						fmt.Printf("%s: installation error: %s\n", names[idx], err.Error())
 					}
+					fmt.Printf("%s: installed\n", names[idx])
 				} else if err != nil {
-					fmt.Printf("%s: error: %s\n", appConfig.Plugins[idx], err.Error())
+					fmt.Printf("%s: error: %s\n", names[idx], err.Error())
 				} else if update != nil {
-					fmt.Printf("%s: updating: %s\n", appConfig.Plugins[idx], *update)
+					fmt.Printf("%s: updating: %s\n", names[idx], *update)
 					if err := pluginInstance.InstallUpdate(); err != nil {
-						fmt.Printf("%s: update error: %s\n", appConfig.Plugins[idx], err.Error())
+						fmt.Printf("%s: update error: %s\n", names[idx], err.Error())
 					}
+					fmt.Printf("%s: updated\n", names[idx])
 				} else {
-					fmt.Printf("%s: up to date\n", appConfig.Plugins[idx])
+					fmt.Printf("%s: up to date\n", names[idx])
 				}
 				waitGroup.Done()
 			}(idx, pluginInstance)
