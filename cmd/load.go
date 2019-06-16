@@ -37,6 +37,8 @@ var versionCmd = &cobra.Command{
 
 		lines := make([]string, 0)
 
+		lines = append(lines, "autoload -U compaudit compinit")
+
 		for _, plugin := range plugins {
 			linesPlugin, err := plugin.Load()
 			if err != nil {
@@ -45,6 +47,8 @@ var versionCmd = &cobra.Command{
 			}
 			lines = append(lines, linesPlugin...)
 		}
+
+		lines = append(lines, "compinit -u -C")
 
 		for _, line := range lines {
 			fmt.Println(line)

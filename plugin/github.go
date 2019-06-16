@@ -16,7 +16,7 @@ type GitHub struct {
 	requiredVersionType string
 	requiredVersion     string
 	root                string
-	dir                 *Dir
+	Dir                 *Dir
 	repository          *git.Repository
 	update              *plumbing.Hash
 }
@@ -47,17 +47,17 @@ func NewGitHub(
 		requiredVersionType: requiredVersionType,
 		requiredVersion:     requiredVersion,
 		root:                root,
-		dir:                 dir,
+		Dir:                 dir,
 	}
 
 	return &ret, nil
 }
 
 func (p *GitHub) Load() ([]string, error) {
-	if p.dir == nil {
+	if p.Dir == nil {
 		return nil, errors.New("plugin is not present on the drive")
 	}
-	return p.dir.Load()
+	return p.Dir.Load()
 }
 
 func (p *GitHub) referenceName() *plumbing.ReferenceName {
@@ -99,17 +99,17 @@ func (p *GitHub) clone() error {
 		return errors.Wrap(err, "while cloning the repository")
 	}
 
-	p.dir = &Dir{Path: path}
+	p.Dir = &Dir{Path: path}
 
 	return nil
 }
 
 func (p *GitHub) CheckUpdate() (*string, error) {
-	if p.dir == nil {
+	if p.Dir == nil {
 		return nil, NotInstalled
 	}
 
-	repo, err := git.PlainOpen(p.dir.Path)
+	repo, err := git.PlainOpen(p.Dir.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 }
 
 func (p *GitHub) InstallUpdate() error {
-	if p.dir == nil {
+	if p.Dir == nil {
 		return p.clone()
 	}
 
