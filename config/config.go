@@ -43,17 +43,11 @@ func (c Config) GetPlugins() (names []string, plugins []plugin.Plugin, err error
 			filename := submatch[1]
 			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "plugins", filename)})
 			names = append(names, pluginSpec)
-			continue
-		}
-
-		if submatch := dirPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
+		} else if submatch := dirPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			filename := submatch[1]
 			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "plugins", filename)})
 			names = append(names, pluginSpec)
-			continue
-		}
-
-		if submatch := githubPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
+		} else if submatch := githubPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			username := submatch[1]
 			repositoryName := submatch[2]
 
@@ -63,35 +57,25 @@ func (c Config) GetPlugins() (names []string, plugins []plugin.Plugin, err error
 			}
 			plugins = append(plugins, githubPlugin)
 			names = append(names, pluginSpec)
-			continue
-		}
-
-		if pluginSpec == "ohmyzsh" {
+		} else if pluginSpec == "ohmyzsh" {
 			if err := loadOhMyZsh(); err != nil {
 				return nil, nil, err
 			}
-			continue
-		}
-
-		if submatch := ohMyZshPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
+		} else if submatch := ohMyZshPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			if err := loadOhMyZsh(); err != nil {
 				return nil, nil, err
 			}
 			ohMyZshPlugins = append(ohMyZshPlugins, ohMyZsh.LoadPlugin(submatch[1]))
 			ohMyZshNames = append(ohMyZshNames, pluginSpec)
-			continue
-		}
-
-		if submatch := ohMyZshThemeRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
+		} else if submatch := ohMyZshThemeRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
 			if err := loadOhMyZsh(); err != nil {
 				return nil, nil, err
 			}
 			ohMyZshPlugins = append(ohMyZshPlugins, ohMyZsh.LoadTheme(submatch[1]))
 			ohMyZshNames = append(ohMyZshNames, pluginSpec)
-			continue
+		} else {
+			return nil, nil, errors.New("unknown plugin format")
 		}
-
-		return nil, nil, errors.New("unknown plugin format")
 	}
 
 	if ohMyZsh != nil {
