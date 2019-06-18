@@ -58,14 +58,24 @@ func initConfig() {
 	}
 
 	configFile, err := ioutil.ReadFile(appConfigFile)
-	if err != nil {
+	if os.IsNotExist(err) {
+		configData, err := json.MarshalIndent(config.DefaultConfig, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		if err := ioutil.WriteFile(appConfigFile, configData, os.ModePerm); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	} else if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}
-
-	if err := json.Unmarshal(configFile, &appConfig); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	} else {
+		if err := json.Unmarshal(configFile, &appConfig); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 
 	var logsPath string
