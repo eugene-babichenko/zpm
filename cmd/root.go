@@ -30,7 +30,7 @@ var RootCmd = &cobra.Command{
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Println("failed to execute the command:", err)
 		os.Exit(1)
 	}
 }
@@ -49,7 +49,7 @@ func init() {
 func initConfig() {
 	home, err := homedir.Dir()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("cannot access the home directory:", err)
 		os.Exit(1)
 	}
 
@@ -61,19 +61,19 @@ func initConfig() {
 	if os.IsNotExist(err) {
 		configData, err := json.MarshalIndent(config.DefaultConfig, "", "  ")
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("failed to write the default config:", err)
 			os.Exit(1)
 		}
 		if err := ioutil.WriteFile(appConfigFile, configData, os.ModePerm); err != nil {
-			fmt.Println(err)
+			fmt.Println("failed to write the default config:", err)
 			os.Exit(1)
 		}
 	} else if err != nil {
-		fmt.Println(err)
+		fmt.Println("failed to read the configuration file", err)
 		os.Exit(1)
 	} else {
 		if err := json.Unmarshal(configFile, &appConfig); err != nil {
-			fmt.Println(err)
+			fmt.Println("failed to parse the configuration file:", err)
 			os.Exit(1)
 		}
 	}
