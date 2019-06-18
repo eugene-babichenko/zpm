@@ -174,3 +174,7 @@ func (p *GitHub) InstallUpdate() error {
 
 	return worktree.Checkout(&git.CheckoutOptions{Hash: *p.update})
 }
+
+func (p GitHub) GetPath() string {
+	return p.Dir.Path
+}

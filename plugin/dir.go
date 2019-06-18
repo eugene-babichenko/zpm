@@ -52,3 +52,7 @@ func (p Dir) CheckUpdate() (*string, error) {
 func (p Dir) InstallUpdate() error {
 	return nil
 }
+
+func (p Dir) GetPath() string {
+	return p.Path
+}

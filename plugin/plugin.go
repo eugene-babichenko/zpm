@@ -12,4 +12,5 @@ type Plugin interface {
 	Load() (fpath []string, exec []string, err error)
 	CheckUpdate() (message *string, err error)
 	InstallUpdate() error
+	GetPath() string
 }
