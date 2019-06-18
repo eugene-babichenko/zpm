@@ -42,7 +42,7 @@ func init() {
 		&appConfigFile,
 		"config",
 		"",
-		fmt.Sprintf("config file (default: %s)", defaultRootPrompt),
+		fmt.Sprintf("Config file location (default: %s)", defaultRootPrompt),
 	)
 }
 

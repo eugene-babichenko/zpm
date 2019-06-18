@@ -95,7 +95,7 @@ func init() {
 		&noCache,
 		"no-cache",
 		false,
-		"do not use and set cache when loading plugins",
+		"Do not use and set cache when loading plugins",
 	)
 
 	RootCmd.AddCommand(versionCmd)
