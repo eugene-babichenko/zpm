@@ -36,7 +36,7 @@ var versionCmd = &cobra.Command{
 			return
 		}
 
-		_, plugins, err := appConfig.GetPlugins()
+		_, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			fmt.Println("# cannot load plugins:", err.Error())
 			os.Exit(1)

@@ -13,7 +13,7 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check for updates",
 	Run: func(cmd *cobra.Command, args []string) {
-		names, plugins, err := appConfig.GetPlugins()
+		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			logger.Fatal("while reading plugin configurations: ", err.Error())
 			os.Exit(1)

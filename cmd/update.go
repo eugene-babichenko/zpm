@@ -18,7 +18,7 @@ var updateCmd = &cobra.Command{
 			logger.Error("while invalidating cache: ", err.Error())
 		}
 
-		names, plugins, err := appConfig.GetPlugins()
+		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			logger.Fatal("while reading plugin configurations: ", err.Error())
 		}
