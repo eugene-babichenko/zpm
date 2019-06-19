@@ -2,12 +2,23 @@ package plugin
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
 
 type File struct {
 	Path string
+}
+
+func MakeFile(root string, params []string) (*Plugin, error) {
+	if len(params) != 1 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	plugin := Plugin(File{Path: filepath.Join(root, params[0])})
+
+	return &plugin, nil
 }
 
 func (p File) Load() (fpath []string, exec []string, err error) {

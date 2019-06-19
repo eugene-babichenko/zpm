@@ -12,6 +12,55 @@ type OhMyZsh struct {
 	github *GitHub
 }
 
+var ohMyZshInstance *OhMyZsh
+
+func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
+	if len(params) != 0 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	if ohMyZshInstance != nil {
+		plugin := Plugin(ohMyZshInstance)
+		return &plugin, nil
+	}
+
+	ohMyZshInstanceLocal, err := NewOhMyZsh(root)
+	ohMyZshInstance = ohMyZshInstanceLocal
+	plugin := Plugin(ohMyZshInstance)
+
+	return &plugin, err
+}
+
+func MakeOhMyZshPlugin(root string, params []string) (*Plugin, error) {
+	if len(params) != 1 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	_, err := MakeOhMyZsh(root, []string{})
+	if err != nil {
+		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
+	}
+
+	ohMyZshPlugin := Plugin(ohMyZshInstance.LoadPlugin(params[0]))
+
+	return &ohMyZshPlugin, nil
+}
+
+func MakeOhMyZshTheme(root string, params []string) (*Plugin, error) {
+	if len(params) != 1 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	_, err := MakeOhMyZsh(root, []string{})
+	if err != nil {
+		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
+	}
+
+	ohMyZshTheme := Plugin(ohMyZshInstance.LoadTheme(params[0]))
+
+	return &ohMyZshTheme, nil
+}
+
 func NewOhMyZsh(root string) (*OhMyZsh, error) {
 	github, err := NewGitHub("robbyrussell", "oh-my-zsh", "branch", "master", root)
 	if err != nil {

@@ -12,6 +12,16 @@ type Dir struct {
 	Path string
 }
 
+func MakeDir(root string, params []string) (*Plugin, error) {
+	if len(params) != 1 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	plugin := Plugin(Dir{Path: filepath.Join(root, params[0])})
+
+	return &plugin, nil
+}
+
 func (p Dir) Load() (fpath []string, exec []string, err error) {
 	stat, err := os.Stat(p.Path)
 	if err != nil {

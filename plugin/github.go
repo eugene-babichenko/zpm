@@ -21,6 +21,17 @@ type GitHub struct {
 	update              *plumbing.Hash
 }
 
+func MakeGitHub(root string, params []string) (*Plugin, error) {
+	if len(params) != 2 {
+		return nil, errors.New("invalid number of parameters")
+	}
+
+	github, err := NewGitHub(params[0], params[1], "branch", "master", root)
+	plugin := Plugin(github)
+
+	return &plugin, err
+}
+
 func NewGitHub(
 	username string,
 	repository string,
