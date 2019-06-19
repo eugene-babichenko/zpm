@@ -14,12 +14,12 @@ type pluginLoader struct {
 }
 
 var loaders = []pluginLoader{
-	{MakeGitHub, regexp.MustCompile(`github:([a-z0-9\-]+)/([a-z0-9\-]+)`)},
-	{MakeDir, regexp.MustCompile(`dir:(.*)`)},
-	{MakeFile, regexp.MustCompile(`file:(.*)`)},
-	{MakeOhMyZsh, regexp.MustCompile(`oh-my-zsh`)},
-	{MakeOhMyZshPlugin, regexp.MustCompile(`oh-my-zsh:plugin:([a-z0-9\-]+)`)},
-	{MakeOhMyZshTheme, regexp.MustCompile(`oh-my-zsh:theme:([a-z0-9\-]+)`)},
+	{MakeGitHub, regexp.MustCompile(`^github:([a-z0-9\-]+)/([a-z0-9\-]+)$`)},
+	{MakeDir, regexp.MustCompile(`^dir:(.*)$`)},
+	{MakeFile, regexp.MustCompile(`^file:(.*)$`)},
+	{MakeOhMyZsh, regexp.MustCompile(`^oh-my-zsh$`)},
+	{MakeOhMyZshPlugin, regexp.MustCompile(`^oh-my-zsh:plugin:([a-z0-9\-]+)$`)},
+	{MakeOhMyZshTheme, regexp.MustCompile(`^oh-my-zsh:theme:([a-z0-9\-]+)$`)},
 }
 
 func MakePlugin(root string, spec string) (*Plugin, error) {
