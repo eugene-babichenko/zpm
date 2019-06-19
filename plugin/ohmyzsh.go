@@ -61,6 +61,14 @@ func MakeOhMyZshTheme(root string, params []string) (*Plugin, error) {
 	return &ohMyZshTheme, nil
 }
 
+func GetOhMyZsh() *Plugin {
+	if ohMyZshInstance != nil {
+		plugin := Plugin(ohMyZshInstance)
+		return &plugin
+	}
+	return nil
+}
+
 func NewOhMyZsh(root string) (*OhMyZsh, error) {
 	github, err := NewGitHub("robbyrussell", "oh-my-zsh", "branch", "master", root)
 	if err != nil {
