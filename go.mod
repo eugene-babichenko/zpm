@@ -1,4 +1,4 @@
-module zpm
+module github.com/eugene-babichenko/zpm
 
 require (
 	github.com/mitchellh/go-homedir v1.1.0

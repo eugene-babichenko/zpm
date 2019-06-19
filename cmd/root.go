@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"zpm/config"
+	"github.com/eugene-babichenko/zpm/config"
 
 	"encoding/json"
 	"fmt"

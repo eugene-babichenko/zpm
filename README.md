@@ -19,7 +19,7 @@ You will need `go` 1.12 to build this project, so please install it and
 configure Go environment variables. You can follow
 [the official guide][go-guide].
 
-Then just run `make install`.
+Then just run `go get github.com/eugene-babichenko/zpm`.
 
 ## Usage
 

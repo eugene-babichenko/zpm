@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"zpm/plugin"
+	"github.com/eugene-babichenko/zpm/plugin"
 
 	"os"
 	"sync"

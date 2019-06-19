@@ -1,6 +1,6 @@
 package main
 
-import "zpm/cmd"
+import "github.com/eugene-babichenko/zpm/cmd"
 
 func main() {
 	cmd.Execute()
