@@ -1,12 +1,8 @@
 package config
 
 import (
-	"zpm/plugin"
-
-	"path/filepath"
-	"regexp"
-
 	"github.com/pkg/errors"
+	"zpm/plugin"
 )
 
 type Logger struct {
@@ -22,76 +18,21 @@ type Config struct {
 	Logger  Logger
 }
 
-var filePluginRegex = regexp.MustCompile(`file:(.*)`)
-var dirPluginRegex = regexp.MustCompile(`dir:(.*)`)
-var githubPluginRegex = regexp.MustCompile(`github:([a-z0-9\-]+)/([a-z0-9\-]+)`)
-var ohMyZshPluginRegex = regexp.MustCompile(`oh-my-zsh:plugin:([a-z0-9\-]+)`)
-var ohMyZshThemeRegex = regexp.MustCompile(`oh-my-zsh:theme:([a-z0-9\-]+)`)
-
 func (c Config) GetPlugins() (names []string, plugins []plugin.Plugin, err error) {
-	var ohMyZsh *plugin.OhMyZsh
-	ohMyZshPlugins := make([]plugin.Plugin, 0)
-	ohMyZshNames := make([]string, 0)
-
-	loadOhMyZsh := func() error {
-		if ohMyZsh == nil {
-			ohMyZshLocal, err := plugin.NewOhMyZsh(c.Root)
-			if err != nil {
-				return errors.Wrap(err, "failed to open a repository")
-			}
-
-			ohMyZsh = ohMyZshLocal
-		}
-
-		return nil
-	}
-
 	for _, pluginSpec := range c.Plugins {
-		if submatch := filePluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
-			filename := submatch[1]
-			plugins = append(plugins, plugin.File{Path: filepath.Join(c.Root, "Plugins", filename)})
+		p, err := plugin.MakePlugin(c.Root, pluginSpec)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "while loading plugins")
+		}
+		if pluginSpec != "oh-my-zsh" {
+			plugins = append(plugins, *p)
 			names = append(names, pluginSpec)
-		} else if submatch := dirPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
-			filename := submatch[1]
-			plugins = append(plugins, plugin.Dir{Path: filepath.Join(c.Root, "Plugins", filename)})
-			names = append(names, pluginSpec)
-		} else if submatch := githubPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
-			username := submatch[1]
-			repositoryName := submatch[2]
-
-			githubPlugin, err := plugin.NewGitHub(username, repositoryName, "branch", "master", c.Root)
-			if err != nil {
-				return nil, nil, errors.Wrap(err, "failed to open a repository")
-			}
-			plugins = append(plugins, githubPlugin)
-			names = append(names, pluginSpec)
-		} else if pluginSpec == "ohmyzsh" {
-			if err := loadOhMyZsh(); err != nil {
-				return nil, nil, err
-			}
-		} else if submatch := ohMyZshPluginRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
-			if err := loadOhMyZsh(); err != nil {
-				return nil, nil, err
-			}
-			ohMyZshPlugins = append(ohMyZshPlugins, ohMyZsh.LoadPlugin(submatch[1]))
-			ohMyZshNames = append(ohMyZshNames, pluginSpec)
-		} else if submatch := ohMyZshThemeRegex.FindStringSubmatch(pluginSpec); len(submatch) > 0 {
-			if err := loadOhMyZsh(); err != nil {
-				return nil, nil, err
-			}
-			ohMyZshPlugins = append(ohMyZshPlugins, ohMyZsh.LoadTheme(submatch[1]))
-			ohMyZshNames = append(ohMyZshNames, pluginSpec)
-		} else {
-			return nil, nil, errors.New("unknown plugin format")
 		}
 	}
 
-	if ohMyZsh != nil {
-		ohMyZshPlugins = append(ohMyZshPlugins, ohMyZsh)
-		plugins = append(ohMyZshPlugins, plugins...)
-
-		ohMyZshNames = append(ohMyZshNames, "oh-my-zsh")
-		names = append(ohMyZshNames, names...)
+	if ohMyZsh := plugin.GetOhMyZsh(); ohMyZsh != nil {
+		plugins = append([]plugin.Plugin{*ohMyZsh}, plugins...)
+		names = append([]string{"oh-my-zsh"}, names...)
 	}
 
 	return names, plugins, nil
