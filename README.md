@@ -30,7 +30,7 @@ installation (`$GOPATH/bin`) into the `PATH` variable and after you load any
 completions into the shell.
 
 ```bash
-eval $(zpm load)
+source <(zpm load)
 ```
 
 ### Configuration
