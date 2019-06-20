@@ -8,8 +8,8 @@
 * [x] Allow to work w/o the cache
 * [ ] Check for updates on load
   * [x] Install new plugins
-  * [ ] Prompt to install updates
-  * [ ] Check for zpm updates
+  * [x] Prompt to install updates
+  * [x] Check for zpm updates
   * [ ] Allow to set check period (1 hour, 1 day, etc)
   * [ ] Async check: load shell immediately, check in the background and show a system notification
 * [ ] Settings
