@@ -8,7 +8,8 @@ type Logger struct {
 }
 
 type Config struct {
-	Plugins []string
-	Root    string
-	Logger  Logger
+	Plugins           []string
+	Root              string
+	Logger            Logger
+	UpdateCheckPeriod string
 }

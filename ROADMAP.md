@@ -10,7 +10,7 @@
   * [x] Install new plugins
   * [x] Prompt to install updates
   * [x] Check for zpm updates
-  * [ ] Allow to set check period (1 hour, 1 day, etc)
+  * [x] Allow to set check period (1 hour, 1 day, etc)
   * [ ] Async check: load shell immediately, check in the background and show a system notification
 * [ ] Settings
   * [x] Use `$HOME/Library` instead of `$HOME` by default on macOS

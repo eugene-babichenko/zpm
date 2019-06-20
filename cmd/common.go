@@ -1,7 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
+	"github.com/eugene-babichenko/zpm/meta"
 	"github.com/eugene-babichenko/zpm/plugin"
+	"io/ioutil"
+	"os"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -43,4 +48,17 @@ func MakePluginsFromSpecs(
 	}
 
 	return names, plugins, nil
+}
+
+func updateMeta() {
+	newMeta := meta.Meta{
+		LastUpdateCheck: time.Now().Format(meta.LastUpdateCheckLayout),
+	}
+	newMetaJSON, err := json.Marshal(newMeta)
+	if err != nil {
+		logger.Fatal("failed to write down the meta file: ", err.Error())
+	}
+	if err := ioutil.WriteFile(metaFilePath, []byte(newMetaJSON), os.ModePerm); err != nil {
+		logger.Fatal("failed to write down the meta file: ", err.Error())
+	}
 }

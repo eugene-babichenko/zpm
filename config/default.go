@@ -1,8 +1,9 @@
 package config
 
 var DefaultConfig = Config{
-	Plugins: []string{},
-	Root:    "",
+	Plugins:           []string{},
+	Root:              "",
+	UpdateCheckPeriod: "24h",
 	Logger: Logger{
 		MaxSize:    500,
 		MaxAge:     28,
