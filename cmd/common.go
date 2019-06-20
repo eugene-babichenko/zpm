@@ -16,7 +16,7 @@ func checkPluginUpdate(name string, pluginInstance plugin.Plugin) (*string, erro
 	} else if update != nil {
 		logger.Infof("update available for %s: %s", name, *update)
 	} else {
-		logger.Info("up to date: ", name)
+		logger.Debug("up to date: ", name)
 	}
 
 	return update, err
