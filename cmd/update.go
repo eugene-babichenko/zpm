@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var onlyMissing bool
+
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Install updates and download missing plugins",
@@ -28,6 +30,15 @@ var updateCmd = &cobra.Command{
 
 		for idx, pluginInstance := range plugins {
 			go func(name string, pluginInstance plugin.Plugin) {
+				defer waitGroup.Done()
+
+				pluginPath := pluginInstance.GetPath()
+				if pluginPath != nil {
+					if stat, _ := os.Stat(*pluginPath); stat != nil && onlyMissing {
+						return
+					}
+				}
+
 				update, err := checkPluginUpdate(name, pluginInstance)
 
 				if plugin.IsNotInstalled(err) {
@@ -43,8 +54,6 @@ var updateCmd = &cobra.Command{
 					}
 					logger.Info("updated: ", names)
 				}
-
-				waitGroup.Done()
 			}(names[idx], pluginInstance)
 		}
 
@@ -53,5 +62,12 @@ var updateCmd = &cobra.Command{
 }
 
 func init() {
+	updateCmd.Flags().BoolVar(
+		&onlyMissing,
+		"only-missing",
+		false,
+		"Only install missing dependencies without updating the installed ones",
+	)
+
 	RootCmd.AddCommand(updateCmd)
 }
