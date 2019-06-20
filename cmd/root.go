@@ -49,7 +49,7 @@ func init() {
 		&appConfigFile,
 		"config",
 		"",
-		fmt.Sprintf("Config file location (default: %s)", defaultRootPrompt),
+		fmt.Sprintf("Config file location (default: $HOME/.zpm.yaml)"),
 	)
 }
 
@@ -91,12 +91,12 @@ func initConfig() {
 		}
 	}
 
-	var logsPath string
 	if len(appConfig.Root) == 0 {
-		appConfig.Root = filepath.Join(home, defaultRoot)
-		logsPath = filepath.Join(home, defaultLogs)
-	} else {
-		logsPath = filepath.Join(appConfig.Root, "Logs")
+		appConfig.Root = filepath.Join(home, config.DefaultRoot)
+	}
+
+	if len(appConfig.LogsPath) == 0 {
+		appConfig.LogsPath = filepath.Join(home, config.DefaultLogs)
 	}
 
 	cachePath = filepath.Join(appConfig.Root, "cache.zsh")
@@ -128,7 +128,7 @@ func initConfig() {
 	}
 
 	fileLogger := &lumberjack.Logger{
-		Filename:   filepath.Join(logsPath, "zpm.log"),
+		Filename:   filepath.Join(appConfig.LogsPath, "zpm.log"),
 		MaxSize:    appConfig.Logger.MaxSize,
 		MaxAge:     appConfig.Logger.MaxAge,
 		MaxBackups: appConfig.Logger.MaxBackups,
