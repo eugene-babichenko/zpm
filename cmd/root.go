@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/config"
+	"time"
 
 	"encoding/json"
 	"fmt"
@@ -110,11 +111,24 @@ func initConfig() {
 		LocalTime:  true,
 		Compress:   false,
 	}
+
+	encoderConfig := zap.NewDevelopmentEncoderConfig()
+	encoderConfig.EncodeTime = timeEncoder
+	encoderConfig.EncodeLevel = levelEncoder
+
 	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
+		zapcore.NewConsoleEncoder(encoderConfig),
 		zapcore.AddSync(io.MultiWriter(os.Stdout, fileLogger)),
 		level,
 	)
 
 	logger = zap.New(core).Sugar()
+}
+
+func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("Mon Jan 2 15:04:05 2006"))
+}
+
+func levelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString("[" + l.CapitalString() + "]")
 }
