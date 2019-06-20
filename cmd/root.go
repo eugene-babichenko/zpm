@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"gopkg.in/yaml.v2"
 )
 
 var appConfigFile string
@@ -78,7 +79,13 @@ func initConfig() {
 		fmt.Println("failed to read the configuration file", err)
 		os.Exit(1)
 	} else {
-		if err := json.Unmarshal(configFile, &appConfig); err != nil {
+		switch filepath.Ext(appConfigFile) {
+		case "json":
+			err = json.Unmarshal(configFile, &appConfig)
+		case "yaml", "yml":
+			err = yaml.Unmarshal(configFile, &appConfig)
+		}
+		if err != nil {
 			fmt.Println("failed to parse the configuration file:", err)
 			os.Exit(1)
 		}

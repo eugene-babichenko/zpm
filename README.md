@@ -6,8 +6,8 @@ This tool was designed after seeing other plugin managers as slow or/and
 inconvenient. Primary design goals when developing this tool were:
 
 - Make it fast;
-- Allow to configure it with some conventional format (I picked JSON, YAML is
-  coming soon);
+- Allow to configure it with some conventional format (JSON and YAML are
+  supported);
 - Keep `.zshrc` clean;
 - Be able to work with Oh My Zsh plugins;
 - Work with updates;
