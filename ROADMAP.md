@@ -12,9 +12,9 @@
   * [x] Check for zpm updates
   * [x] Allow to set check period (1 hour, 1 day, etc)
   * [ ] Async check: load shell immediately, check in the background and show a system notification
-* [ ] Settings
+* [x] Settings
   * [x] Use `$HOME/Library` instead of `$HOME` by default on macOS
-  * [ ] Allow to specify a package version (branch, tag, git commit)
+  * [x] Allow to specify a package version (branch, tag, git commit)
 * [ ] Plugin management CLI (CRUD)
 * [ ] Allow loading plugins without installing them
 * [ ] Purge plugins directory

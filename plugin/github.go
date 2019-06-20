@@ -2,31 +2,34 @@ package plugin
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"os"
+	"path/filepath"
 )
 
 type GitHub struct {
-	username            string
-	repositoryName      string
-	requiredVersionType string
-	requiredVersion     string
-	root                string
-	Dir                 *Dir
-	repository          *git.Repository
-	update              *plumbing.Hash
+	username        string
+	repositoryName  string
+	requiredVersion string
+	root            string
+	Dir             *Dir
+	repository      *git.Repository
+	update          *plumbing.Hash
 }
 
 func MakeGitHub(root string, params []string) (*Plugin, error) {
-	if len(params) != 2 {
+	if len(params) != 4 {
 		return nil, errors.New("invalid number of parameters")
 	}
 
-	github, err := NewGitHub(params[0], params[1], "branch", "master", root)
+	requiredRevision := "master"
+	if params[3] != "" {
+		requiredRevision = params[3]
+	}
+
+	github, err := NewGitHub(params[0], params[1], requiredRevision, root)
 	plugin := Plugin(github)
 
 	return &plugin, err
@@ -35,7 +38,6 @@ func MakeGitHub(root string, params []string) (*Plugin, error) {
 func NewGitHub(
 	username string,
 	repository string,
-	requiredVersionType string,
 	requiredVersion string,
 	root string,
 ) (*GitHub, error) {
@@ -53,12 +55,11 @@ func NewGitHub(
 	}
 
 	ret := GitHub{
-		username:            username,
-		repositoryName:      repository,
-		requiredVersionType: requiredVersionType,
-		requiredVersion:     requiredVersion,
-		root:                root,
-		Dir:                 dir,
+		username:        username,
+		repositoryName:  repository,
+		requiredVersion: requiredVersion,
+		root:            root,
+		Dir:             dir,
 	}
 
 	return &ret, nil
@@ -71,20 +72,6 @@ func (p *GitHub) Load() ([]string, []string, error) {
 	return p.Dir.Load()
 }
 
-func (p *GitHub) referenceName() *plumbing.ReferenceName {
-	var referenceName plumbing.ReferenceName
-	switch p.requiredVersionType {
-	case "branch":
-		referenceName = plumbing.NewBranchReferenceName(p.requiredVersion)
-	case "tag":
-		referenceName = plumbing.NewTagReferenceName(p.requiredVersion)
-	default:
-		return nil
-	}
-
-	return &referenceName
-}
-
 func (p *GitHub) clone() error {
 	parentPath := filepath.Join(p.root, "Plugins", "github.com", p.username)
 	if err := os.MkdirAll(parentPath, os.ModePerm); err != nil && !os.IsExist(err) {
@@ -94,18 +81,7 @@ func (p *GitHub) clone() error {
 	path := filepath.Join(p.root, "Plugins", "github.com", p.username, p.repositoryName)
 
 	repositoryURL := fmt.Sprintf("https://github.com/%s/%s.git", p.username, p.repositoryName)
-
-	referenceName := p.referenceName()
-	if referenceName == nil {
-		return errors.New("unknown git referenceName type")
-	}
-
-	cloneOptions := git.CloneOptions{
-		URL:           repositoryURL,
-		ReferenceName: *referenceName,
-		SingleBranch:  true,
-	}
-
+	cloneOptions := git.CloneOptions{URL: repositoryURL}
 	if _, err := git.PlainClone(path, false, &cloneOptions); err != nil {
 		return errors.Wrap(err, "while cloning the repository")
 	}
@@ -143,13 +119,18 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 		return nil, errors.Wrap(err, "while fetching the repositoryName")
 	}
 
-	referenceName := p.referenceName()
-	if referenceName == nil {
-		return nil, errors.New("unknown git referenceName type")
-	}
-	newVersion, err := repo.ResolveRevision(plumbing.Revision(referenceName.String()))
+	newVersionRemote := plumbing.NewRemoteReferenceName("origin", p.requiredVersion)
+	newVersion, err := repo.ResolveRevision(plumbing.Revision(newVersionRemote))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get the revision")
+		newVersion, err = repo.ResolveRevision(plumbing.Revision(p.requiredVersion))
+		if err != nil {
+			newVersionLocal := plumbing.NewHash(p.requiredVersion)
+			newVersion = &newVersionLocal
+			if o, _ := repo.CommitObject(newVersionLocal); o == nil {
+				return nil, errors.New("failed to get the revision")
+			}
+			return nil, errors.New("failed to get the revision")
+		}
 	}
 
 	if *newVersion == currentVersion {

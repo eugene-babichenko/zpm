@@ -15,8 +15,13 @@ type OhMyZsh struct {
 var ohMyZshInstance *OhMyZsh
 
 func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
-	if len(params) != 0 {
+	if len(params) != 2 {
 		return nil, errors.New("invalid number of parameters")
+	}
+
+	requiredRevision := "master"
+	if params[1] != "" {
+		requiredRevision = params[1]
 	}
 
 	if ohMyZshInstance != nil {
@@ -24,7 +29,7 @@ func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
 		return &plugin, nil
 	}
 
-	ohMyZshInstanceLocal, err := NewOhMyZsh(root)
+	ohMyZshInstanceLocal, err := NewOhMyZsh(root, requiredRevision)
 	ohMyZshInstance = ohMyZshInstanceLocal
 	plugin := Plugin(ohMyZshInstance)
 
@@ -69,8 +74,8 @@ func GetOhMyZsh() *Plugin {
 	return nil
 }
 
-func NewOhMyZsh(root string) (*OhMyZsh, error) {
-	github, err := NewGitHub("robbyrussell", "oh-my-zsh", "branch", "master", root)
+func NewOhMyZsh(root string, requiredVersion string) (*OhMyZsh, error) {
+	github, err := NewGitHub("robbyrussell", "oh-my-zsh", requiredVersion, root)
 	if err != nil {
 		return nil, errors.Wrap(err, "ohmyzsh")
 	}
