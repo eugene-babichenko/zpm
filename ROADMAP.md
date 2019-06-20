@@ -7,7 +7,7 @@
   * [ ] Completion cache
 * [x] Allow to work w/o the cache
 * [ ] Check for updates on load
-  * [ ] Install new plugins
+  * [x] Install new plugins
   * [ ] Prompt to install updates
   * [ ] Check for zpm updates
   * [ ] Allow to set check period (1 hour, 1 day, etc)

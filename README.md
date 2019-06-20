@@ -30,6 +30,11 @@ installation (`$GOPATH/bin`) into the `PATH` variable and after you load any
 completions into the shell.
 
 ```bash
+# Check if there are plugins, that are list in the config but installed, and
+# install them. Remove `--only-missing` if you want to update all of your
+# plugins automatically.
+zpm update --only-missing
+# Load plugins into the shell
 source <(zpm load)
 ```
 
