@@ -44,6 +44,6 @@ func (p File) InstallUpdate() error {
 	return nil
 }
 
-func (p File) GetPath() string {
-	return p.Path
+func (p File) GetPath() *string {
+	return &p.Path
 }

@@ -63,6 +63,6 @@ func (p Dir) InstallUpdate() error {
 	return nil
 }
 
-func (p Dir) GetPath() string {
-	return p.Path
+func (p Dir) GetPath() *string {
+	return &p.Path
 }

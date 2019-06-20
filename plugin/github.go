@@ -186,6 +186,9 @@ func (p *GitHub) InstallUpdate() error {
 	return worktree.Checkout(&git.CheckoutOptions{Hash: *p.update})
 }
 
-func (p GitHub) GetPath() string {
-	return p.Dir.Path
+func (p GitHub) GetPath() *string {
+	if p.Dir != nil {
+		return &p.Dir.Path
+	}
+	return nil
 }

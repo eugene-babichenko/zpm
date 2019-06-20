@@ -117,6 +117,6 @@ func (p *OhMyZsh) LoadTheme(name string) Dir {
 	return Dir{Path: path}
 }
 
-func (p OhMyZsh) GetPath() string {
+func (p OhMyZsh) GetPath() *string {
 	return p.github.GetPath()
 }
