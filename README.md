@@ -45,10 +45,20 @@ source <(zpm load)
 
 ### Configuration
 
-The configuration is located in `~/.zpm.json`. You can change the location of
+The configuration is located in `~/.zpm.yaml`. You can change the location of
 your configuration file using the `--config` argument.
 
 Here is an example configuration:
+
+```yaml
+Plugins:
+- github:zsh-users/zsh-autosuggestions
+- github:mafredri/zsh-async
+- github:sindresorhus/pure
+- oh-my-zsh:plugin:colored-man-pages
+```
+
+JSON is also possible:
 
 ```json
 {

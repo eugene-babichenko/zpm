@@ -61,12 +61,12 @@ func initConfig() {
 	}
 
 	if appConfigFile == "" {
-		appConfigFile = filepath.Join(home, ".zpm.json")
+		appConfigFile = filepath.Join(home, ".zpm.yaml")
 	}
 
 	configFile, err := ioutil.ReadFile(appConfigFile)
 	if os.IsNotExist(err) {
-		configData, err := json.MarshalIndent(config.DefaultConfig, "", "  ")
+		configData, err := yaml.Marshal(config.DefaultConfig)
 		if err != nil {
 			fmt.Println("failed to write the default config:", err)
 			os.Exit(1)
