@@ -45,7 +45,11 @@ var versionCmd = &cobra.Command{
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
 
-		lines := []string{"autoload -U compaudit compinit"}
+		lines := []string{
+			"ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"",
+
+			"autoload -U compaudit compinit",
+		}
 
 		for _, plugin := range plugins {
 			fpathPlugin, execPlugin, err := plugin.Load()
@@ -64,7 +68,7 @@ var versionCmd = &cobra.Command{
 		}
 		_, _ = fmt.Fprint(&fpathBuilder, "$fpath)")
 
-		lines = append(lines, fpathBuilder.String(), "compinit -u -C")
+		lines = append(lines, fpathBuilder.String(), "compinit -u -C -d \"${ZSH_COMPDUMP}\"")
 		lines = append(lines, exec...)
 
 		for _, line := range lines {

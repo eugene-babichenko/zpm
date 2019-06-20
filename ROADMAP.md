@@ -2,9 +2,9 @@
   * [x] Sane log format
   * [ ] Logs in the terminal when loading
   * [x] Log files
-* [ ] Cache: handle software updates
+* [x] Cache: handle software updates
   * [x] Own cache
-  * [ ] Completion cache
+  * [x] Completion cache
 * [x] Allow to work w/o the cache
 * [ ] Check for updates on load
   * [x] Install new plugins
