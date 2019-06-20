@@ -15,7 +15,7 @@ func loadCache() bool {
 		return false
 	}
 
-	stat, err := os.Stat(cachePath)
+	stat, err := os.Stat(cachePath())
 	if err != nil {
 		fmt.Println("# error reading cache", err.Error())
 		return false
@@ -24,7 +24,7 @@ func loadCache() bool {
 		fmt.Println("# error reading cache: not a file")
 		return false
 	}
-	fmt.Printf("source " + cachePath)
+	fmt.Printf("source " + cachePath())
 	return true
 }
 
@@ -75,7 +75,7 @@ var versionCmd = &cobra.Command{
 			return
 		}
 
-		cacheFile, err := os.Create(cachePath)
+		cacheFile, err := os.Create(cachePath())
 		if err != nil {
 			fmt.Println("# cannot write cache:", err.Error())
 			os.Exit(1)

@@ -1,15 +1,19 @@
 package cmd
 
 import (
-	"encoding/json"
 	"github.com/eugene-babichenko/zpm/meta"
 	"github.com/eugene-babichenko/zpm/plugin"
+
+	"encoding/json"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
 )
+
+var Version string
 
 func checkPluginUpdate(name string, pluginInstance plugin.Plugin) (*string, error) {
 	update, err := pluginInstance.CheckUpdate()
@@ -61,4 +65,8 @@ func updateMeta() {
 	if err := ioutil.WriteFile(metaFilePath, []byte(newMetaJSON), os.ModePerm); err != nil {
 		logger.Fatal("failed to write down the meta file: ", err.Error())
 	}
+}
+
+func cachePath() string {
+	return filepath.Join(appConfig.Root, "cache-"+Version+".zsh")
 }

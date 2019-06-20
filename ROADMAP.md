@@ -3,7 +3,7 @@
   * [ ] Logs in the terminal when loading
   * [x] Log files
 * [ ] Cache: handle software updates
-  * [ ] Own cache
+  * [x] Own cache
   * [ ] Completion cache
 * [x] Allow to work w/o the cache
 * [ ] Check for updates on load

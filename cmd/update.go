@@ -42,7 +42,7 @@ var updateCmd = &cobra.Command{
 	Short: "Install updates and download missing plugins",
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug("invalidating cache...")
-		if err := os.RemoveAll(cachePath); err != nil {
+		if err := os.RemoveAll(cachePath()); err != nil {
 			logger.Error("while invalidating cache: ", err.Error())
 		}
 

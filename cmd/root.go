@@ -22,7 +22,6 @@ import (
 
 var appConfigFile string
 var appConfig config.Config
-var cachePath string
 var metaFilePath string
 var updateCheckPeriod time.Duration
 
@@ -98,8 +97,6 @@ func initConfig() {
 	if len(appConfig.LogsPath) == 0 {
 		appConfig.LogsPath = filepath.Join(home, config.DefaultLogs)
 	}
-
-	cachePath = filepath.Join(appConfig.Root, "cache.zsh")
 
 	if appConfig.UpdateCheckPeriod != "" {
 		updateCheckPeriodLocal, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
