@@ -1,6 +1,7 @@
 # zpm - simple and fast zsh plugins manager
 
-`zpm` is a plugin manager for `zsh` designed to be fast and easy to configure.
+`zpm` is a plugin manager for [`zsh`][zsh] designed to be fast and easy to
+configure.
 
 This tool was designed after seeing other plugin managers as slow or/and
 inconvenient. Primary design goals when developing this tool were:
@@ -9,9 +10,24 @@ inconvenient. Primary design goals when developing this tool were:
 - Allow to configure it with some conventional format (JSON and YAML are
   supported);
 - Keep `.zshrc` clean;
-- Be able to work with Oh My Zsh plugins;
+- Be able to work with [Oh My Zsh][ohmyzsh] plugins;
 - Work with updates;
 - Make it easily extensible.
+
+This project is largely influenced by [Antigen][antigen] and
+[Antibody][antibody].
+
+## Contents
+
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+  - [Your `.zshrc`](#your-zshrc)
+  - [Configuring plugins](#configuring-plugins)
+  - [Installing and updating plugins](#installing-and-updating-plugins)
+- [Configuration](#configuration)
+- [Available commands](#available-commands)
+- [Caching](#caching)
+- [Contributing](#contributing)
 
 ## Getting Started
 
@@ -45,8 +61,9 @@ source <(zpm load)
 
 ### Configuring plugins
 
-The configuration is located in `~/.zpm.yaml`. You can change the location of
-your configuration file using the `--config` argument.
+The configuration is located in `~/.zpm.yaml` and will be created automatically
+on the first run. You can change the location of your configuration file using
+the `--config` argument.
 
 Here is an example configuration:
 
@@ -125,4 +142,25 @@ This section contains the list of available configuration keys.
   - `Level` (`string`) - logging level. Valid values are `debug`, `info`,
     `error` and `fatal`. The default value is `info`.
 
+## Available commands
+
+Run `zpm help` to get the full list of available commands and their flags.
+
+## Caching
+
+`zpm` caches the script that loads plugins for faster loading. This behavior
+can be disabled by running `zpm load` with `--no-cache`. The cache is located in
+the `zpm` plugins root directory and is reset when plugins or `zpm` itself are
+updated.
+
+## Contributing
+
+I appreciate any help! You can submit your questions, proposals and bugs found
+to the GitHub Issues. Also there is [the road map](ROADMAP.md) for upcoming
+features. Feel free to implement any of those if you want!
+
 [go-guide]: https://golang.org/doc/install
+[antigen]: https://github.com/zsh-users/antigen
+[antibody]: https://github.com/getantibody/antibody
+[ohmyzsh]: https://github.com/robbyrussell/oh-my-zsh
+[zsh]: https://sourceforge.net/projects/zsh/
