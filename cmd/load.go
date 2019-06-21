@@ -28,7 +28,7 @@ func loadCache() bool {
 	return true
 }
 
-var versionCmd = &cobra.Command{
+var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -97,12 +97,12 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
-	versionCmd.Flags().BoolVar(
+	loadCmd.Flags().BoolVar(
 		&noCache,
 		"no-cache",
 		false,
 		"Do not use and set cache when loading plugins",
 	)
 
-	RootCmd.AddCommand(versionCmd)
+	RootCmd.AddCommand(loadCmd)
 }
