@@ -3,5 +3,7 @@
 
 package config
 
-const DefaultRoot = "Library/zpm"
-const DefaultLogs = "Library/LogsPath/zpm"
+const (
+	DefaultRoot = "Library/zpm"
+	DefaultLogs = "Library/LogsPath/zpm"
+)

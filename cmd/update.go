@@ -9,8 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var onlyMissing bool
-var pluginToCheck string
+var (
+	onlyMissing   bool
+	pluginToCheck string
+)
 
 func update(name string, pluginInstance plugin.Plugin) {
 	pluginPath := pluginInstance.GetPath()

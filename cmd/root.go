@@ -20,19 +20,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var appConfigFile string
-var appConfig config.Config
-var metaFilePath string
-var updateCheckPeriod time.Duration
+var (
+	appConfigFile     string
+	appConfig         config.Config
+	metaFilePath      string
+	updateCheckPeriod time.Duration
 
-var lastUpdate time.Time
+	lastUpdate time.Time
 
-var logger *zap.SugaredLogger
+	logger *zap.SugaredLogger
 
-var RootCmd = &cobra.Command{
-	Use:   "zpm [command]",
-	Short: "A simple zsh plugin manager",
-}
+	RootCmd = &cobra.Command{
+		Use:   "zpm [command]",
+		Short: "A simple zsh plugin manager",
+	}
+)
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
