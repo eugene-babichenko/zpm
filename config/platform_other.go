@@ -1,4 +1,5 @@
 // +build !darwin
+// Platform-specific default values.
 
 package config
 

@@ -31,6 +31,8 @@ func checkPluginUpdate(name string, pluginInstance plugin.Plugin) (*string, erro
 	return update, err
 }
 
+// Make plugins from the specification values. `names` are required for display
+// in logs.
 func MakePluginsFromSpecs(
 	root string,
 	pluginSpecs []string,
@@ -40,12 +42,16 @@ func MakePluginsFromSpecs(
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "while loading plugins")
 		}
+		// Oh My Zsh is required to be inserted in the beginning of the plugin
+		// load sequence.
 		if pluginSpec != "oh-my-zsh" {
 			plugins = append(plugins, *p)
 			names = append(names, pluginSpec)
 		}
 	}
 
+	// Oh My Zsh is required to be inserted in the beginning of the plugin load
+	// sequence.
 	if ohMyZsh := plugin.GetOhMyZsh(); ohMyZsh != nil {
 		plugins = append([]plugin.Plugin{*ohMyZsh}, plugins...)
 		names = append([]string{"oh-my-zsh"}, names...)
@@ -54,6 +60,7 @@ func MakePluginsFromSpecs(
 	return names, plugins, nil
 }
 
+// Update the last time of check for updates.
 func updateMeta() {
 	newMeta := meta.Meta{
 		LastUpdateCheck: time.Now().Format(meta.LastUpdateCheckLayout),

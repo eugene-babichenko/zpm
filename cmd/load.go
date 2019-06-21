@@ -46,8 +46,9 @@ var versionCmd = &cobra.Command{
 		exec := make([]string, 0)
 
 		lines := []string{
+			// Use different compdump for different zsh versions (kindly
+			// borrowed from Oh My Zsh).
 			"ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"",
-
 			"autoload -U compaudit compinit",
 		}
 
@@ -68,6 +69,7 @@ var versionCmd = &cobra.Command{
 		}
 		_, _ = fmt.Fprint(&fpathBuilder, "$fpath)")
 
+		// Load completions from `fpath`.
 		lines = append(lines, fpathBuilder.String(), "compinit -u -C -d \"${ZSH_COMPDUMP}\"")
 		lines = append(lines, exec...)
 

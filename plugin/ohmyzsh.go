@@ -7,11 +7,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The plugin type to deal with Oh My Zsh
 type OhMyZsh struct {
 	root   string
 	github *GitHub
 }
 
+// Other plugins can depend on Oh My Zsh so we need a single global instance of it.
 var ohMyZshInstance *OhMyZsh
 
 func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
@@ -94,6 +96,7 @@ func (p *OhMyZsh) Load() (fpath []string, exec []string, err error) {
 		return nil, nil, errors.Wrap(err, "ohmyzsh")
 	}
 
+	// load zsh library files
 	libraries := fmt.Sprintf(
 		"for config_file (%s/lib/*.zsh); do source $config_file; done",
 		p.github.Dir.Path,

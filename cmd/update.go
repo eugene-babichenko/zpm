@@ -46,6 +46,7 @@ var updateCmd = &cobra.Command{
 			logger.Error("while invalidating cache: ", err.Error())
 		}
 
+		// Update a single plugin if required.
 		if pluginToCheck != "" {
 			var pluginFound bool
 			for _, pluginSpec := range appConfig.Plugins {
@@ -60,7 +61,7 @@ var updateCmd = &cobra.Command{
 				if pluginInstance == nil {
 					logger.Fatal("cannot load plugin instance")
 				}
-				//nil not possible because the program will exit on `logger.Fatal`
+				// nil not possible because the program will exit on `logger.Fatal`
 				//noinspection GoNilness
 				update(pluginToCheck, *pluginInstance)
 
@@ -96,7 +97,7 @@ func init() {
 		&pluginToCheck,
 		"plugin",
 		"",
-		"Update the specified plugin",
+		"Update only the specified plugin",
 	)
 
 	updateCmd.Flags().BoolVar(

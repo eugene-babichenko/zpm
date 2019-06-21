@@ -1,3 +1,6 @@
+// Note that this file uses `go-git`. This was considered more fast and reliable
+// than using an external `git` binary.
+
 package plugin
 
 import (
@@ -9,14 +12,20 @@ import (
 	"path/filepath"
 )
 
+// The plugin type downloaded from GitHub.
 type GitHub struct {
-	username        string
-	repositoryName  string
-	requiredVersion string
-	root            string
-	Dir             *Dir
-	repository      *git.Repository
-	update          *plumbing.Hash
+	// The name of a GitHub account (user or organization).
+	accountName string
+	// The name of a repository inside that account.
+	repositoryName string
+	// The required revision. This can be a branch, a tag or a commit hash.
+	requiredRevision string
+	root             string
+	// We reuse the `Dir` plugin type to load the plugin into zsh.
+	Dir        *Dir
+	repository *git.Repository
+	// The target commit hash set by `CheckUpdate`.
+	update *plumbing.Hash
 }
 
 func MakeGitHub(root string, params []string) (*Plugin, error) {
@@ -38,7 +47,7 @@ func MakeGitHub(root string, params []string) (*Plugin, error) {
 func NewGitHub(
 	username string,
 	repository string,
-	requiredVersion string,
+	requiredRevision string,
 	root string,
 ) (*GitHub, error) {
 	var dir *Dir
@@ -55,11 +64,11 @@ func NewGitHub(
 	}
 
 	ret := GitHub{
-		username:        username,
-		repositoryName:  repository,
-		requiredVersion: requiredVersion,
-		root:            root,
-		Dir:             dir,
+		accountName:      username,
+		repositoryName:   repository,
+		requiredRevision: requiredRevision,
+		root:             root,
+		Dir:              dir,
 	}
 
 	return &ret, nil
@@ -73,14 +82,14 @@ func (p *GitHub) Load() ([]string, []string, error) {
 }
 
 func (p *GitHub) clone() error {
-	parentPath := filepath.Join(p.root, "Plugins", "github.com", p.username)
+	parentPath := filepath.Join(p.root, "Plugins", "github.com", p.accountName)
 	if err := os.MkdirAll(parentPath, os.ModePerm); err != nil && !os.IsExist(err) {
 		return errors.Wrap(err, "while creating github plugin object")
 	}
 
-	path := filepath.Join(p.root, "Plugins", "github.com", p.username, p.repositoryName)
+	path := filepath.Join(p.root, "Plugins", "github.com", p.accountName, p.repositoryName)
 
-	repositoryURL := fmt.Sprintf("https://github.com/%s/%s.git", p.username, p.repositoryName)
+	repositoryURL := fmt.Sprintf("https://github.com/%s/%s.git", p.accountName, p.repositoryName)
 	cloneOptions := git.CloneOptions{URL: repositoryURL}
 	if _, err := git.PlainClone(path, false, &cloneOptions); err != nil {
 		return errors.Wrap(err, "while cloning the repository")
@@ -119,12 +128,13 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 		return nil, errors.Wrap(err, "while fetching the repositoryName")
 	}
 
-	newVersionRemote := plumbing.NewRemoteReferenceName("origin", p.requiredVersion)
+	// because we fetch, not pull, we need to check the remote branches
+	newVersionRemote := plumbing.NewRemoteReferenceName("origin", p.requiredRevision)
 	newVersion, err := repo.ResolveRevision(plumbing.Revision(newVersionRemote))
 	if err != nil {
-		newVersion, err = repo.ResolveRevision(plumbing.Revision(p.requiredVersion))
+		newVersion, err = repo.ResolveRevision(plumbing.Revision(p.requiredRevision))
 		if err != nil {
-			newVersionLocal := plumbing.NewHash(p.requiredVersion)
+			newVersionLocal := plumbing.NewHash(p.requiredRevision)
 			newVersion = &newVersionLocal
 			if o, _ := repo.CommitObject(newVersionLocal); o == nil {
 				return nil, errors.New("failed to get the revision")
@@ -139,7 +149,7 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 
 	updateString := fmt.Sprintf(
 		"%s: update from %s to %s",
-		p.requiredVersion,
+		p.requiredRevision,
 		currentVersion,
 		newVersion,
 	)
@@ -151,6 +161,7 @@ func (p *GitHub) CheckUpdate() (*string, error) {
 }
 
 func (p *GitHub) InstallUpdate() error {
+	// install if an existing installation not found
 	if p.Dir == nil {
 		return p.clone()
 	}

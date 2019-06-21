@@ -1,3 +1,4 @@
+// The detailed documentation on those structs can be found in `README`.
 package config
 
 type Logger struct {

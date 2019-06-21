@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The plugin type loaded from a file. Not that id does not support `fpath`.
 type File struct {
 	Path string
 }
