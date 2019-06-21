@@ -60,8 +60,16 @@ func MakePluginsFromSpecs(
 	return names, plugins, nil
 }
 
+func cachePath() string {
+	return filepath.Join(appConfig.Root, "cache-"+Version+".zsh")
+}
+
+func metaPath() string {
+	return filepath.Join(appConfig.Root, "meta.json")
+}
+
 // Update the last time of check for updates.
-func updateMeta() {
+func updateLastUpdateCheckTime() {
 	newMeta := meta.Meta{
 		LastUpdateCheck: time.Now().Format(meta.LastUpdateCheckLayout),
 	}
@@ -69,11 +77,21 @@ func updateMeta() {
 	if err != nil {
 		logger.Fatal("failed to write down the meta file: ", err.Error())
 	}
-	if err := ioutil.WriteFile(metaFilePath, []byte(newMetaJSON), os.ModePerm); err != nil {
+	if err := ioutil.WriteFile(metaPath(), []byte(newMetaJSON), os.ModePerm); err != nil {
 		logger.Fatal("failed to write down the meta file: ", err.Error())
 	}
 }
 
-func cachePath() string {
-	return filepath.Join(appConfig.Root, "cache-"+Version+".zsh")
+func readLastUpdateCheckTime() time.Time {
+	var lastUpdateCheckTime time.Time
+	metaFile, err := ioutil.ReadFile(metaPath())
+	if err != nil {
+		return lastUpdateCheckTime
+	}
+	var metaData meta.Meta
+	if err := json.Unmarshal(metaFile, &metaData); err != nil {
+		return lastUpdateCheckTime
+	}
+	lastUpdateCheckTime, _ = time.Parse(meta.LastUpdateCheckLayout, metaData.LastUpdateCheck)
+	return lastUpdateCheckTime
 }

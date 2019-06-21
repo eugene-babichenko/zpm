@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/config"
-	"github.com/eugene-babichenko/zpm/meta"
 	"github.com/pkg/errors"
 
 	"encoding/json"
@@ -24,10 +23,6 @@ import (
 var (
 	appConfigFile     string
 	appConfig         config.Config
-	metaFilePath      string
-	updateCheckPeriod time.Duration
-
-	lastUpdate time.Time
 
 	logger *zap.SugaredLogger
 
@@ -72,25 +67,7 @@ func initConfig() {
 		os.Exit(1)
 	}
 
-	if len(appConfig.Root) == 0 {
-		appConfig.Root = filepath.Join(home, config.DefaultRoot)
-	}
-
-	if len(appConfig.LogsPath) == 0 {
-		appConfig.LogsPath = filepath.Join(home, config.DefaultLogs)
-	}
-
-	if appConfig.UpdateCheckPeriod != "" {
-		updateCheckPeriodLocal, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
-		if err != nil {
-			fmt.Println("failed to parse the update check period")
-			os.Exit(1)
-		}
-		updateCheckPeriod = updateCheckPeriodLocal
-	} else {
-		updateCheckPeriodLocal, _ := time.ParseDuration("24h")
-		updateCheckPeriod = updateCheckPeriodLocal
-	}
+	appConfig.Validate()
 
 	var level zapcore.Level
 	switch appConfig.Logger.Level {
@@ -126,17 +103,6 @@ func initConfig() {
 	)
 
 	logger = zap.New(core).Sugar()
-
-	metaFilePath = filepath.Join(appConfig.Root, "meta.json")
-	metaFile, err := ioutil.ReadFile(metaFilePath)
-	if err != nil {
-		return
-	}
-	var metaData meta.Meta
-	if err := json.Unmarshal(metaFile, &metaData); err != nil {
-		return
-	}
-	lastUpdate, _ = time.Parse(meta.LastUpdateCheckLayout, metaData.LastUpdateCheck)
 }
 
 func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {

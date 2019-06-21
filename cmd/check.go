@@ -24,7 +24,12 @@ period defined in the settings have passed since the last check.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if periodicCheck {
-			if lastUpdate.Add(updateCheckPeriod).After(time.Now()) {
+			updateCheckPeriod, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
+			if err != nil {
+				logger.Fatal("failed to parse the update check period")
+			}
+
+			if readLastUpdateCheckTime().Add(updateCheckPeriod).After(time.Now()) {
 				return
 			}
 		}
@@ -63,7 +68,7 @@ period defined in the settings have passed since the last check.
 			logger.Info("You can run the update using `zpm update`.")
 		}
 
-		updateMeta()
+		updateLastUpdateCheckTime()
 	},
 }
 

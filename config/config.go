@@ -17,3 +17,16 @@ type Config struct {
 	UpdateCheckPeriod string   `yaml:"UpdateCheckPeriod"`
 	LogsPath          string   `yaml:"LogsPath"`
 }
+
+// Validate assigns the default values to the config fields when applicable
+func (c *Config) Validate() {
+	if c.Root == "" {
+		c.Root = DefaultRoot
+	}
+	if c.LogsPath == "" {
+		c.LogsPath = DefaultLogsPath
+	}
+	if c.UpdateCheckPeriod == "" {
+		c.UpdateCheckPeriod = "24h"
+	}
+}

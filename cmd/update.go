@@ -90,7 +90,7 @@ var updateCmd = &cobra.Command{
 
 		waitGroup.Wait()
 
-		updateMeta()
+		updateLastUpdateCheckTime()
 	},
 }
 
