@@ -21,8 +21,8 @@ import (
 )
 
 var (
-	appConfigFile     string
-	appConfig         config.Config
+	appConfigFile string
+	appConfig     config.Config
 
 	logger *zap.SugaredLogger
 
@@ -69,18 +69,9 @@ func initConfig() {
 
 	appConfig.Validate()
 
-	var level zapcore.Level
-	switch appConfig.Logger.Level {
-	case "debug":
-		level = zap.DebugLevel
-	case "info":
-		level = zap.InfoLevel
-	case "error":
-		level = zap.ErrorLevel
-	case "fatal":
-		level = zap.FatalLevel
-	default:
-		level = zap.InfoLevel
+	level, err := getLoggingLevel(appConfig.Logger.Level)
+	if err != nil {
+		fmt.Printf("failed to set the logging level: %s\n", err.Error())
 	}
 
 	fileLogger := &lumberjack.Logger{
@@ -103,6 +94,23 @@ func initConfig() {
 	)
 
 	logger = zap.New(core).Sugar()
+}
+
+func getLoggingLevel(levelString string) (zapcore.Level, error) {
+	var level zapcore.Level
+	switch levelString {
+	case "debug":
+		level = zap.DebugLevel
+	case "info":
+		level = zap.InfoLevel
+	case "error":
+		level = zap.ErrorLevel
+	case "fatal":
+		level = zap.FatalLevel
+	default:
+		return level, errors.New("invalid logging level specification")
+	}
+	return level, nil
 }
 
 func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
