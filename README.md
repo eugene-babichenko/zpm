@@ -37,7 +37,7 @@ You will need `go` 1.12 to build this project, so please install it and
 configure Go environment variables. You can follow
 [the official guide][go-guide].
 
-Then just run `go get github.com/eugene-babichenko/zpm`.
+Then just run `go get -u github.com/eugene-babichenko/zpm`.
 
 ### Your `.zshrc`
 
