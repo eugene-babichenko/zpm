@@ -1,0 +1,42 @@
+before:
+  hooks:
+    - go mod download
+builds:
+- env:
+  - CGO_ENABLED=0
+  goos:
+  - darwin
+  - linux
+  ignore:
+  - goos: darwin
+    goarch: 386
+archives:
+- replacements:
+    darwin: macOS
+    386: i386
+nfpms:
+- replacements:
+    darwin: macOS 
+    386: i386
+  homepage: https://github.com/eugene-babichenko/zpm
+  description: Simple and fast zsh plugins manager
+  license: MIT
+  formats:
+  - deb
+  - rpm
+  recommends:
+  - zsh
+  scripts:
+    postinstall: "scripts/postinstall.sh"
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-{{ .ShortCommit }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+release:
+  draft: true
