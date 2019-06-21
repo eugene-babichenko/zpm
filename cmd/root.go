@@ -51,13 +51,12 @@ func init() {
 }
 
 func initConfig() {
-	home, err := homedir.Dir()
-	if err != nil {
-		fmt.Println("cannot access the home directory:", err)
-		os.Exit(1)
-	}
-
 	if appConfigFile == "" {
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println("cannot access the home directory:", err)
+			os.Exit(1)
+		}
 		appConfigFile = filepath.Join(home, ".zpm.yaml")
 	}
 
