@@ -43,7 +43,7 @@ func MakeOhMyZshPlugin(root string, params []string) (*Plugin, error) {
 		return nil, errors.New("invalid number of parameters")
 	}
 
-	_, err := MakeOhMyZsh(root, []string{})
+	_, err := MakeOhMyZsh(root, []string{"", ""})
 	if err != nil {
 		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
 	}
@@ -58,7 +58,7 @@ func MakeOhMyZshTheme(root string, params []string) (*Plugin, error) {
 		return nil, errors.New("invalid number of parameters")
 	}
 
-	_, err := MakeOhMyZsh(root, []string{})
+	_, err := MakeOhMyZsh(root, []string{"", ""})
 	if err != nil {
 		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
 	}

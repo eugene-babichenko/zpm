@@ -67,6 +67,7 @@ func initConfig() {
 
 	configFile, err := ioutil.ReadFile(appConfigFile)
 	if os.IsNotExist(err) {
+		appConfig = config.DefaultConfig
 		configData, err := yaml.Marshal(config.DefaultConfig)
 		if err != nil {
 			fmt.Println("failed to write the default config:", err)
@@ -81,10 +82,13 @@ func initConfig() {
 		os.Exit(1)
 	} else {
 		switch filepath.Ext(appConfigFile) {
-		case "json":
+		case ".json":
 			err = json.Unmarshal(configFile, &appConfig)
-		case "yaml", "yml":
+		case ".yaml", ".yml":
 			err = yaml.Unmarshal(configFile, &appConfig)
+		default:
+			fmt.Println("unsupported configuration file extension")
+			os.Exit(1)
 		}
 		if err != nil {
 			fmt.Println("failed to parse the configuration file:", err)
