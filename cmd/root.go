@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/eugene-babichenko/zpm/config"
 	"github.com/eugene-babichenko/zpm/meta"
+	"github.com/pkg/errors"
 
 	"encoding/json"
 	"fmt"
@@ -65,35 +66,10 @@ func initConfig() {
 		appConfigFile = filepath.Join(home, ".zpm.yaml")
 	}
 
-	configFile, err := ioutil.ReadFile(appConfigFile)
-	if os.IsNotExist(err) {
-		appConfig = config.DefaultConfig
-		configData, err := yaml.Marshal(config.DefaultConfig)
-		if err != nil {
-			fmt.Println("failed to write the default config:", err)
-			os.Exit(1)
-		}
-		if err := ioutil.WriteFile(appConfigFile, configData, os.ModePerm); err != nil {
-			fmt.Println("failed to write the default config:", err)
-			os.Exit(1)
-		}
-	} else if err != nil {
-		fmt.Println("failed to read the configuration file", err)
+	appConfig, err := loadConfigOrCreateDefault(appConfigFile)
+	if err != nil {
+		fmt.Printf("failed to read the config: %s\n", err.Error())
 		os.Exit(1)
-	} else {
-		switch filepath.Ext(appConfigFile) {
-		case ".json":
-			err = json.Unmarshal(configFile, &appConfig)
-		case ".yaml", ".yml":
-			err = yaml.Unmarshal(configFile, &appConfig)
-		default:
-			fmt.Println("unsupported configuration file extension")
-			os.Exit(1)
-		}
-		if err != nil {
-			fmt.Println("failed to parse the configuration file:", err)
-			os.Exit(1)
-		}
 	}
 
 	if len(appConfig.Root) == 0 {
@@ -169,4 +145,41 @@ func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 
 func levelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString("[" + l.CapitalString() + "]")
+}
+
+func loadConfigOrCreateDefault(path string) (*config.Config, error) {
+	if configFile, err := ioutil.ReadFile(path); os.IsNotExist(err) {
+		var configData []byte
+		switch filepath.Ext(path) {
+		case ".json":
+			configData, err = json.Marshal(config.DefaultConfig)
+		case ".yaml", ".yml":
+			configData, err = yaml.Marshal(config.DefaultConfig)
+		default:
+			return nil, errors.New("unsupported extension")
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to build the config file contents")
+		}
+		if err := ioutil.WriteFile(path, configData, os.ModePerm); err != nil {
+			return nil, errors.Wrap(err, "failed to write the config file")
+		}
+		return &config.DefaultConfig, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "failed to read the config file")
+	} else {
+		var configData config.Config
+		switch filepath.Ext(path) {
+		case ".json":
+			err = json.Unmarshal(configFile, &configData)
+		case ".yaml", ".yml":
+			err = yaml.Unmarshal(configFile, &configData)
+		default:
+			return nil, errors.New("unsupported extension")
+		}
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse the config file")
+		}
+		return &configData, nil
+	}
 }
