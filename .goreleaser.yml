@@ -28,6 +28,12 @@ nfpms:
   - zsh
   scripts:
     postinstall: "scripts/postinstall.sh"
+brews:
+- github:
+    owner: eugene-babichenko
+    name: homebrew-tap
+  homepage: https://github.com/eugene-babichenko/zpm
+  description: Simple and fast zsh plugins manager
 checksum:
   name_template: 'checksums.txt'
 snapshot:
