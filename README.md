@@ -1,5 +1,13 @@
 # zpm - simple and fast zsh plugins manager
 
+<center>
+
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://img.shields.io/badge/license-MIT-brightgreen.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/eugene-babichenko/zpm)](https://goreportcard.com/report/github.com/eugene-babichenko/zpm)
+[![Powered by: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=flat-square)](https://github.com/goreleaser)
+
+</center>
+
 `zpm` is a plugin manager for [`zsh`][zsh] designed to be fast and easy to
 configure.
 
