@@ -1,0 +1,8 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+script:
+  - GO111MODULE=on go test ./...
