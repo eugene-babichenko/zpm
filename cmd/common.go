@@ -37,6 +37,7 @@ func MakePluginsFromSpecs(
 	root string,
 	pluginSpecs []string,
 ) (names []string, plugins []plugin.Plugin, err error) {
+	root = filepath.Join(root, "Plugins")
 	for _, pluginSpec := range pluginSpecs {
 		p, err := plugin.MakePlugin(root, pluginSpec)
 		if err != nil {

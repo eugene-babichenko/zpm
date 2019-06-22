@@ -9,8 +9,7 @@ import (
 
 // The plugin type to deal with Oh My Zsh
 type OhMyZsh struct {
-	root   string
-	github *GitHub
+	git Git
 }
 
 // Other plugins can depend on Oh My Zsh so we need a single global instance of it.
@@ -31,11 +30,13 @@ func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
 		return &plugin, nil
 	}
 
-	ohMyZshInstanceLocal, err := NewOhMyZsh(root, requiredRevision)
-	ohMyZshInstance = ohMyZshInstanceLocal
+	URL := filepath.Join("github.com", "robbyrussell", "oh-my-zsh")
+	git := NewGit(URL, requiredRevision, root)
+
+	ohMyZshInstance = &OhMyZsh{git: git}
 	plugin := Plugin(ohMyZshInstance)
 
-	return &plugin, err
+	return &plugin, nil
 }
 
 func MakeOhMyZshPlugin(root string, params []string) (*Plugin, error) {
@@ -76,22 +77,8 @@ func GetOhMyZsh() *Plugin {
 	return nil
 }
 
-func NewOhMyZsh(root string, requiredVersion string) (*OhMyZsh, error) {
-	github, err := NewGitHub("robbyrussell", "oh-my-zsh", requiredVersion, root)
-	if err != nil {
-		return nil, errors.Wrap(err, "ohmyzsh")
-	}
-
-	ohMyZsh := &OhMyZsh{
-		root:   filepath.Join(root, "Plugins", "github.com", "robbyrussell", "oh-my-zsh"),
-		github: github,
-	}
-
-	return ohMyZsh, nil
-}
-
 func (p *OhMyZsh) Load() (fpath []string, exec []string, err error) {
-	fpath, exec, err = p.github.Load()
+	fpath, exec, err = p.git.Load()
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "ohmyzsh")
 	}
@@ -99,32 +86,31 @@ func (p *OhMyZsh) Load() (fpath []string, exec []string, err error) {
 	// load zsh library files
 	libraries := fmt.Sprintf(
 		"for config_file (%s/lib/*.zsh); do source $config_file; done",
-		p.github.Dir.Path,
+		p.git.Dir.Path,
 	)
-
 	exec = append(exec, libraries)
 
 	return fpath, exec, nil
 }
 
 func (p *OhMyZsh) CheckUpdate() (*string, error) {
-	return p.github.CheckUpdate()
+	return p.git.CheckUpdate()
 }
 
 func (p *OhMyZsh) InstallUpdate() error {
-	return p.github.InstallUpdate()
+	return p.git.InstallUpdate()
 }
 
 func (p *OhMyZsh) LoadPlugin(name string) Dir {
-	path := filepath.Join(p.root, "plugins", name)
+	path := filepath.Join(p.git.Dir.Path, "plugins", name)
 	return Dir{Path: path}
 }
 
 func (p *OhMyZsh) LoadTheme(name string) Dir {
-	path := filepath.Join(p.root, "themes", name)
+	path := filepath.Join(p.git.Dir.Path, "themes", name)
 	return Dir{Path: path}
 }
 
-func (p OhMyZsh) GetPath() *string {
-	return p.github.GetPath()
+func (p *OhMyZsh) GetPath() *string {
+	return p.git.GetPath()
 }

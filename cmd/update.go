@@ -15,27 +15,24 @@ var (
 )
 
 func update(name string, pluginInstance plugin.Plugin) {
-	pluginPath := pluginInstance.GetPath()
-	if pluginPath != nil {
-		if stat, _ := os.Stat(*pluginPath); stat != nil && onlyMissing {
-			return
-		}
-	}
-
 	update, err := checkPluginUpdate(name, pluginInstance)
 
 	if plugin.IsNotInstalled(err) {
 		logger.Info("installing: ", name)
 		if err := pluginInstance.InstallUpdate(); err != nil {
 			logger.Errorf("installation error for %s: %s", name, err.Error())
+			return
 		}
 		logger.Info("installed: ", name)
 	} else if err == nil && update != nil {
 		logger.Infof("updating %s: %s", name, *update)
 		if err := pluginInstance.InstallUpdate(); err != nil {
 			logger.Errorf("while updating %s: %s", name, err.Error())
+			return
 		}
 		logger.Info("updated: ", name)
+	} else if err != nil {
+		logger.Errorf("error while checking for an update: %s", err)
 	}
 }
 

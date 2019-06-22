@@ -3,6 +3,8 @@
 // by default.
 package config
 
+import "path/filepath"
+
 type Logger struct {
 	MaxSize    int    `yaml:"MaxSize"`
 	MaxAge     int    `yaml:"MaxAge"`
@@ -19,12 +21,12 @@ type Config struct {
 }
 
 // Validate assigns the default values to the config fields when applicable
-func (c *Config) Validate() {
+func (c *Config) Validate(home string) {
 	if c.Root == "" {
-		c.Root = DefaultRoot
+		c.Root = filepath.Join(home, DefaultRoot)
 	}
 	if c.LogsPath == "" {
-		c.LogsPath = DefaultLogsPath
+		c.LogsPath = filepath.Join(home, DefaultLogsPath)
 	}
 	if c.UpdateCheckPeriod == "" {
 		c.UpdateCheckPeriod = "24h"

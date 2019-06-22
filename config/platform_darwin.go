@@ -5,5 +5,5 @@ package config
 
 const (
 	DefaultRoot     = "Library/zpm"
-	DefaultLogsPath = "Library/LogsPath/zpm"
+	DefaultLogsPath = "Library/Logs/zpm"
 )

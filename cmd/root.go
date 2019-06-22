@@ -51,22 +51,23 @@ func init() {
 }
 
 func initConfig() {
+	home, err := homedir.Dir()
+	if err != nil {
+		fmt.Println("cannot access the home directory:", err)
+		os.Exit(1)
+	}
+
 	if appConfigFile == "" {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println("cannot access the home directory:", err)
-			os.Exit(1)
-		}
 		appConfigFile = filepath.Join(home, ".zpm.yaml")
 	}
 
-	appConfig, err := loadConfigOrCreateDefault(appConfigFile)
+	appConfigLocal, err := loadConfigOrCreateDefault(appConfigFile)
 	if err != nil {
 		fmt.Printf("failed to read the config: %s\n", err.Error())
 		os.Exit(1)
 	}
-
-	appConfig.Validate()
+	appConfigLocal.Validate(home)
+	appConfig = *appConfigLocal
 
 	level, err := getLoggingLevel(appConfig.Logger.Level)
 	if err != nil {
@@ -106,6 +107,8 @@ func getLoggingLevel(levelString string) (zapcore.Level, error) {
 		level = zap.ErrorLevel
 	case "fatal":
 		level = zap.FatalLevel
+	case "":
+		level = zap.InfoLevel
 	default:
 		return level, errors.New("invalid logging level specification")
 	}
