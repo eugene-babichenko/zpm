@@ -69,6 +69,10 @@ func initConfig() {
 	appConfigLocal.Validate(home)
 	appConfig = *appConfigLocal
 
+	if err := os.MkdirAll(appConfig.Root, os.ModePerm); err != nil && !os.IsExist(err) {
+		logger.Fatal("while creating github plugin object: ", err.Error())
+	}
+
 	level, err := getLoggingLevel(appConfig.Logger.Level)
 	if err != nil {
 		fmt.Printf("failed to set the logging level: %s\n", err.Error())
