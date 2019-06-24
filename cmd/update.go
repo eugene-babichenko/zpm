@@ -24,7 +24,7 @@ func update(name string, pluginInstance plugin.Plugin) {
 			return
 		}
 		logger.Info("installed: ", name)
-	} else if err == nil && update != nil {
+	} else if err == nil && update != nil && !onlyMissing {
 		logger.Infof("updating %s: %s", name, *update)
 		if err := pluginInstance.InstallUpdate(); err != nil {
 			logger.Errorf("while updating %s: %s", name, err.Error())
