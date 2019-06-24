@@ -15,14 +15,10 @@ type OhMyZsh struct {
 // Other plugins can depend on Oh My Zsh so we need a single global instance of it.
 var ohMyZshInstance *OhMyZsh
 
-func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
-	if len(params) != 2 {
-		return nil, errors.New("invalid number of parameters")
-	}
-
-	requiredRevision := "master"
-	if params[1] != "" {
-		requiredRevision = params[1]
+func MakeOhMyZsh(root string, params map[string]string) (*Plugin, error) {
+	requiredRevision, _ := params["version"]
+	if requiredRevision == "" {
+		requiredRevision = "master"
 	}
 
 	if ohMyZshInstance != nil {
@@ -39,32 +35,34 @@ func MakeOhMyZsh(root string, params []string) (*Plugin, error) {
 	return &plugin, nil
 }
 
-func MakeOhMyZshPlugin(root string, params []string) (*Plugin, error) {
-	if len(params) != 1 {
-		return nil, errors.New("invalid number of parameters")
+func MakeOhMyZshPlugin(root string, params map[string]string) (*Plugin, error) {
+	plugin, pluginPrs := params["name"]
+	if !pluginPrs {
+		return nil, errors.New("missing plugin name")
 	}
 
-	_, err := MakeOhMyZsh(root, []string{"", ""})
+	_, err := MakeOhMyZsh(root, map[string]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
 	}
 
-	ohMyZshPlugin := Plugin(ohMyZshInstance.LoadPlugin(params[0]))
+	ohMyZshPlugin := Plugin(ohMyZshInstance.LoadPlugin(plugin))
 
 	return &ohMyZshPlugin, nil
 }
 
-func MakeOhMyZshTheme(root string, params []string) (*Plugin, error) {
-	if len(params) != 1 {
-		return nil, errors.New("invalid number of parameters")
+func MakeOhMyZshTheme(root string, params map[string]string) (*Plugin, error) {
+	theme, themePrs := params["name"]
+	if !themePrs {
+		return nil, errors.New("missing plugin name")
 	}
 
-	_, err := MakeOhMyZsh(root, []string{"", ""})
+	_, err := MakeOhMyZsh(root, map[string]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "while instantiating Oh My Zsh")
 	}
 
-	ohMyZshTheme := Plugin(ohMyZshInstance.LoadTheme(params[0]))
+	ohMyZshTheme := Plugin(ohMyZshInstance.LoadTheme(theme))
 
 	return &ohMyZshTheme, nil
 }

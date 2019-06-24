@@ -13,12 +13,13 @@ type Dir struct {
 	Path string
 }
 
-func MakeDir(root string, params []string) (*Plugin, error) {
-	if len(params) != 1 {
-		return nil, errors.New("invalid number of parameters")
+func MakeDir(root string, params map[string]string) (*Plugin, error) {
+	path, pathPrs := params["directory"]
+	if !pathPrs {
+		return nil, errors.New("missing path")
 	}
 
-	plugin := Plugin(Dir{Path: filepath.Join(root, params[0])})
+	plugin := Plugin(Dir{Path: filepath.Join(root, path)})
 
 	return &plugin, nil
 }

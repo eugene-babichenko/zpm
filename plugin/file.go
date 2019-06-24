@@ -12,12 +12,13 @@ type File struct {
 	Path string
 }
 
-func MakeFile(root string, params []string) (*Plugin, error) {
-	if len(params) != 1 {
-		return nil, errors.New("invalid number of parameters")
+func MakeFile(root string, params map[string]string) (*Plugin, error) {
+	path, pathPrs := params["directory"]
+	if !pathPrs {
+		return nil, errors.New("missing path")
 	}
 
-	plugin := Plugin(File{Path: filepath.Join(root, params[0])})
+	plugin := Plugin(File{Path: filepath.Join(root, path)})
 
 	return &plugin, nil
 }

@@ -8,17 +8,23 @@ import (
 	"path/filepath"
 )
 
-func MakeGitHub(root string, params []string) (*Plugin, error) {
-	if len(params) != 4 {
-		return nil, errors.New("invalid number of parameters")
+func MakeGitHub(root string, params map[string]string) (*Plugin, error) {
+	username, usernamePrs := params["username"]
+	if !usernamePrs {
+		return nil, errors.New("missing username")
 	}
 
-	requiredRevision := "master"
-	if params[3] != "" {
-		requiredRevision = params[3]
+	repo, repoPrs := params["repo"]
+	if !repoPrs {
+		return nil, errors.New("missing repo")
 	}
 
-	URL := filepath.Join("github.com", params[0], params[1])
+	requiredRevision, _ := params["version"]
+	if requiredRevision == "" {
+		requiredRevision = "master"
+	}
+
+	URL := filepath.Join("github.com", username, repo)
 	git := NewGit(URL, requiredRevision, root)
 	plugin := Plugin(&git)
 	return &plugin, nil
