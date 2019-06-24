@@ -38,14 +38,16 @@ func MakePluginsFromSpecs(
 	pluginSpecs []string,
 ) (names []string, plugins []plugin.Plugin, err error) {
 	root = filepath.Join(root, "Plugins")
+	factory := &plugin.Factory{Root: root}
+
 	for _, pluginSpec := range pluginSpecs {
-		p, err := plugin.MakePlugin(root, pluginSpec)
+		p, isDependency, err := factory.MakePlugin(pluginSpec)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "while loading plugins")
 		}
 		// Oh My Zsh is required to be inserted in the beginning of the plugin
 		// load sequence.
-		if pluginSpec != "oh-my-zsh" {
+		if !isDependency {
 			plugins = append(plugins, *p)
 			names = append(names, pluginSpec)
 		}
@@ -53,9 +55,9 @@ func MakePluginsFromSpecs(
 
 	// Oh My Zsh is required to be inserted in the beginning of the plugin load
 	// sequence.
-	if ohMyZsh := plugin.GetOhMyZsh(); ohMyZsh != nil {
-		plugins = append([]plugin.Plugin{*ohMyZsh}, plugins...)
-		names = append([]string{"oh-my-zsh"}, names...)
+	if dependencies, dependenciesNames := factory.Dependencies(); dependencies != nil {
+		plugins = append(dependencies, plugins...)
+		names = append(dependenciesNames, names...)
 	}
 
 	return names, plugins, nil
