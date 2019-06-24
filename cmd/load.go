@@ -8,13 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var noCache bool
-
 func loadCache() bool {
-	if noCache {
-		return false
-	}
-
 	stat, err := os.Stat(cachePath())
 	if err != nil {
 		fmt.Println("# error reading cache", err.Error())
@@ -32,8 +26,12 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
-		if loadCache() {
-			return
+		noCache, _ := cmd.Flags().GetBool("no-cache")
+
+		if !noCache {
+			if loadCache() {
+				return
+			}
 		}
 
 		_, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
@@ -97,8 +95,7 @@ var loadCmd = &cobra.Command{
 }
 
 func init() {
-	loadCmd.Flags().BoolVar(
-		&noCache,
+	loadCmd.Flags().Bool(
 		"no-cache",
 		false,
 		"Do not use and set cache when loading plugins",

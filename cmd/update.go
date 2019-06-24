@@ -9,11 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	onlyMissing   bool
-	pluginToCheck string
-)
-
 func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 	update, err := checkPluginUpdate(name, pluginInstance)
 
@@ -40,6 +35,9 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Install updates and download missing plugins",
 	Run: func(cmd *cobra.Command, args []string) {
+		onlyMissing, _ := cmd.Flags().GetBool("only-missing")
+		pluginToCheck, _ := cmd.Flags().GetString("plugin")
+
 		logger.Debug("invalidating cache...")
 		if err := os.RemoveAll(cachePath()); err != nil {
 			logger.Error("while invalidating cache: ", err.Error())
@@ -76,15 +74,13 @@ var updateCmd = &cobra.Command{
 }
 
 func init() {
-	updateCmd.Flags().StringVar(
-		&pluginToCheck,
+	updateCmd.Flags().String(
 		"plugin",
 		"",
 		"Update only the specified plugin",
 	)
 
-	updateCmd.Flags().BoolVar(
-		&onlyMissing,
+	updateCmd.Flags().Bool(
 		"only-missing",
 		false,
 		"Only install missing dependencies without updating the installed ones",
