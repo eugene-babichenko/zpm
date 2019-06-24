@@ -14,7 +14,7 @@ var (
 	pluginToCheck string
 )
 
-func update(name string, pluginInstance plugin.Plugin) {
+func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 	update, err := checkPluginUpdate(name, pluginInstance)
 
 	if plugin.IsNotInstalled(err) {
@@ -45,32 +45,16 @@ var updateCmd = &cobra.Command{
 			logger.Error("while invalidating cache: ", err.Error())
 		}
 
+		var pluginsList []string
+
 		// Update a single plugin if required.
 		if pluginToCheck != "" {
-			var pluginFound bool
-			for _, pluginSpec := range appConfig.Plugins {
-				pluginFound = pluginFound || (pluginSpec == pluginToCheck)
-			}
-
-			if pluginFound {
-				pluginInstance, err := plugin.MakePlugin(appConfig.Root, pluginToCheck)
-				if err != nil {
-					logger.Fatal("while reading plugin configuration: ", err.Error())
-				}
-				if pluginInstance == nil {
-					logger.Fatal("cannot load plugin instance")
-				}
-				// nil not possible because the program will exit on `logger.Fatal`
-				//noinspection GoNilness
-				update(pluginToCheck, *pluginInstance)
-
-				return
-			}
-
-			logger.Fatal("this plugin is not listed in the configuration")
+			pluginsList = []string{pluginToCheck}
+		} else {
+			pluginsList = appConfig.Plugins
 		}
 
-		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
+		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, pluginsList)
 		if err != nil {
 			logger.Fatal("while reading plugin configurations: ", err.Error())
 		}
@@ -80,7 +64,7 @@ var updateCmd = &cobra.Command{
 
 		for idx, pluginInstance := range plugins {
 			go func(name string, pluginInstance plugin.Plugin) {
-				update(name, pluginInstance)
+				update(name, pluginInstance, onlyMissing)
 				waitGroup.Done()
 			}(names[idx], pluginInstance)
 		}
