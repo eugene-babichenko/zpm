@@ -13,7 +13,7 @@ type File struct {
 }
 
 func MakeFile(root string, params map[string]string) (*Plugin, error) {
-	path, pathPrs := params["directory"]
+	path, pathPrs := params["filename"]
 	if !pathPrs {
 		return nil, errors.New("missing path")
 	}
@@ -26,7 +26,7 @@ func MakeFile(root string, params map[string]string) (*Plugin, error) {
 func (p File) Load() (fpath []string, exec []string, err error) {
 	stat, err := os.Stat(p.Path)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "while loading file plugin")
+		return nil, nil, NotInstalled
 	}
 
 	if stat.Mode()&os.ModeType != 0 {
