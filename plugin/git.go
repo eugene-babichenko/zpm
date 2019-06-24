@@ -120,7 +120,3 @@ func (p *Git) InstallUpdate() error {
 
 	return worktree.Checkout(&git.CheckoutOptions{Hash: *p.update})
 }
-
-func (p *Git) GetPath() *string {
-	return &p.Dir.Path
-}

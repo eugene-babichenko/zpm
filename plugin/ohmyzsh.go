@@ -79,7 +79,3 @@ func (p *OhMyZsh) LoadTheme(name string) Dir {
 	path := filepath.Join(p.git.Dir.Path, "themes", name)
 	return Dir{Path: path}
 }
-
-func (p *OhMyZsh) GetPath() *string {
-	return p.git.GetPath()
-}

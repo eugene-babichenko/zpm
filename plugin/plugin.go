@@ -28,6 +28,4 @@ type Plugin interface {
 	// description or the `NotInstalled` error). Otherwise it may cause a panic
 	// or an unexpected error.
 	InstallUpdate() error
-	// Get the path to a plugin installation directory.
-	GetPath() *string
 }
