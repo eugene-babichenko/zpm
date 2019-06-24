@@ -5,7 +5,7 @@ os:
   - osx
 
 script:
-  - GO111MODULE=on go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - GO111MODULE=on go test -race -coverprofile=coverage.txt -covermode=atomic -coverpkg=./... ./...
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
