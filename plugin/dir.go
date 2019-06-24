@@ -27,7 +27,7 @@ func MakeDir(root string, params map[string]string) (*Plugin, error) {
 func (p Dir) Load() (fpath []string, exec []string, err error) {
 	stat, err := os.Stat(p.Path)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "while loading directory plugin")
+		return nil, nil, NotInstalled
 	}
 	if stat.Mode()&os.ModeType == 0 {
 		return nil, nil, errors.New("the provided path is not a directory: " + p.Path)
