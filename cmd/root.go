@@ -132,9 +132,9 @@ func loadConfigOrCreateDefault(path string) (*config.Config, error) {
 		var configData []byte
 		switch filepath.Ext(path) {
 		case ".json":
-			configData, err = json.Marshal(config.DefaultConfig)
+			configData, err = json.Marshal(config.DefaultConfig())
 		case ".yaml", ".yml":
-			configData, err = yaml.Marshal(config.DefaultConfig)
+			configData, err = yaml.Marshal(config.DefaultConfig())
 		default:
 			return nil, errors.New("unsupported extension")
 		}
@@ -144,7 +144,8 @@ func loadConfigOrCreateDefault(path string) (*config.Config, error) {
 		if err := ioutil.WriteFile(path, configData, os.ModePerm); err != nil {
 			return nil, errors.Wrap(err, "failed to write the config file")
 		}
-		return &config.DefaultConfig, nil
+		c := config.DefaultConfig()
+		return &c, nil
 	} else if err != nil {
 		return nil, errors.Wrap(err, "failed to read the config file")
 	} else {

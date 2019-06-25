@@ -39,7 +39,7 @@ func TestDefaultConfigCreated(t *testing.T) {
 
 		configVal, err := loadConfigOrCreateDefault(configFileName)
 		require.Empty(t, err, "cannot load or create the config")
-		assert.Equal(t, config.DefaultConfig, *configVal, "not a default config returned")
+		assert.Equal(t, config.DefaultConfig(), *configVal, "not a default config returned")
 
 		configFile, err := ioutil.ReadFile(configFileName)
 		require.Empty(t, os.IsNotExist(err), "config not written")
@@ -48,7 +48,7 @@ func TestDefaultConfigCreated(t *testing.T) {
 		var newConfigVal config.Config
 		err = tt.unmarshal(configFile, &newConfigVal)
 		require.Empty(t, err, "cannot parse a new config")
-		assert.Equal(t, config.DefaultConfig, newConfigVal, "not a default config in file")
+		assert.Equal(t, config.DefaultConfig(), newConfigVal, "not a default config in file")
 	}
 }
 
@@ -72,7 +72,7 @@ func TestConfigExists(t *testing.T) {
 
 		configFileName := filepath.Join(tempDir, ".zpm."+tt.extension)
 
-		expectedConfigVal := config.DefaultConfig
+		expectedConfigVal := config.DefaultConfig()
 		expectedConfigVal.Root = "/config"
 
 		configContent, err := tt.marshal(expectedConfigVal)
