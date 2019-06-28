@@ -58,9 +58,9 @@ func (p Dir) Load() (fpath []string, exec []string, err error) {
 }
 
 func (p Dir) CheckUpdate() (*string, error) {
-	return nil, nil
+	return nil, NotUpgradable
 }
 
 func (p Dir) InstallUpdate() error {
-	return nil
+	return NotUpgradable
 }

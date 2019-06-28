@@ -107,3 +107,16 @@ func TestDirLoadNotADirectory(t *testing.T) {
 	_, _, err = (*plugin).Load()
 	assert.NotEmpty(t, err, "expected error")
 }
+
+//   Scenario: Try to update
+//     When the update is checked or attempted to be installed
+//     Then an error is returned
+func TestDirUpdate(t *testing.T) {
+	plugin := Dir{}
+
+	_, err := plugin.CheckUpdate()
+	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
+
+	err = plugin.InstallUpdate()
+	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
+}

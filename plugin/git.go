@@ -79,7 +79,7 @@ func (p *Git) CheckUpdate() (message *string, err error) {
 	}
 
 	if *newVersion == currentVersion {
-		return nil, nil
+		return nil, UpToDate
 	}
 
 	updateString := fmt.Sprintf(

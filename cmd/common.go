@@ -21,12 +21,14 @@ func checkPluginUpdate(name string, pluginInstance plugin.Plugin) (*string, erro
 
 	if plugin.IsNotInstalled(err) {
 		log.Info("not installed: %s", name)
+	} else if plugin.IsNotUpgradable(err) {
+		log.Debug("plugin %s is not upgradable", name)
+	} else if plugin.IsUpToDate(err) {
+		log.Debug("up to date: %s", name)
 	} else if err != nil {
 		log.Error("while checking for %s: %s", name, err)
 	} else if update != nil {
 		log.Info("update available for %s: %s", name, *update)
-	} else {
-		log.Debug("up to date: %s", name)
 	}
 
 	return update, err

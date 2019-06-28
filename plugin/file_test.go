@@ -47,3 +47,16 @@ func TestFileLoadNotExist(t *testing.T) {
 	_, _, err = (*pluginInstance).Load()
 	assert.Equal(t, NotInstalled, err, "the error must be 'plugin not installed'")
 }
+
+//   Scenario: Try to update
+//     When the update is checked or attempted to be installed
+//     Then an error is returned
+func TestFileUpdate(t *testing.T) {
+	plugin := File{}
+
+	_, err := plugin.CheckUpdate()
+	assert.Equal(t, NotUpgradable, err, "the file plugin must not be upgradable")
+
+	err = plugin.InstallUpdate()
+	assert.Equal(t, NotUpgradable, err, "the file plugin must not be upgradable")
+}

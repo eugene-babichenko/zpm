@@ -39,9 +39,9 @@ func (p File) Load() (fpath []string, exec []string, err error) {
 }
 
 func (p File) CheckUpdate() (*string, error) {
-	return nil, nil
+	return nil, NotUpgradable
 }
 
 func (p File) InstallUpdate() error {
-	return nil
+	return NotUpgradable
 }

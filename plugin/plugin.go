@@ -6,10 +6,30 @@ import "github.com/pkg/errors"
 // have not been installed.
 var NotInstalled = errors.New("not installed")
 
+// Returned by `Plugin.CheckUpdate` and indicates that a plugin being checked
+// is not upgradable.
+var NotUpgradable = errors.New("this plugin is not upgradable")
+
+// Returned by `Plugin.CheckUpdate` and indicates that a plugin being checked
+// is up to date.
+var UpToDate = errors.New("up to date")
+
 // Check if a plugin is not installed with the error value of
 // `Plugin.CheckUpdate`.
 func IsNotInstalled(err error) bool {
 	return err == NotInstalled
+}
+
+// Check if a plugin is cannot be updated with the error value of
+// `Plugin.CheckUpdate`.
+func IsNotUpgradable(err error) bool {
+	return err == NotUpgradable
+}
+
+// Check if a plugin is up to date with the error value of
+// `Plugin.CheckUpdate`.
+func IsUpToDate(err error) bool {
+	return err == UpToDate
 }
 
 // This is the universal interface for all plugin types loaded by `zpm`. All
