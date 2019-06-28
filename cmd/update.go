@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/eugene-babichenko/zpm/log"
 	"github.com/eugene-babichenko/zpm/plugin"
 
 	"os"
@@ -13,21 +14,21 @@ func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 	update, err := checkPluginUpdate(name, pluginInstance)
 
 	if plugin.IsNotInstalled(err) {
-		logger.Info("installing: ", name)
+		log.Info("installing: %s", name)
 		if err := pluginInstance.InstallUpdate(); err != nil {
-			logger.Errorf("installation error for %s: %s", name, err.Error())
+			log.Error("installation error for %s: %s", name, err.Error())
 			return
 		}
-		logger.Info("installed: ", name)
+		log.Info("installed: %s", name)
 	} else if err == nil && update != nil && !onlyMissing {
-		logger.Infof("updating %s: %s", name, *update)
+		log.Info("updating %s: %s", name, *update)
 		if err := pluginInstance.InstallUpdate(); err != nil {
-			logger.Errorf("while updating %s: %s", name, err.Error())
+			log.Error("while updating %s: %s", name, err)
 			return
 		}
-		logger.Info("updated: ", name)
+		log.Info("updated: %s", name)
 	} else if err != nil {
-		logger.Errorf("error while checking for an update: %s", err)
+		log.Error("error while checking for an update: %s", err)
 	}
 }
 
@@ -38,9 +39,9 @@ var updateCmd = &cobra.Command{
 		onlyMissing, _ := cmd.Flags().GetBool("only-missing")
 		pluginToCheck, _ := cmd.Flags().GetString("plugin")
 
-		logger.Debug("invalidating cache...")
+		log.Debug("invalidating cache...")
 		if err := os.RemoveAll(cachePath()); err != nil {
-			logger.Error("while invalidating cache: ", err.Error())
+			log.Error("while invalidating cache: %s", err)
 		}
 
 		var pluginsList []string
@@ -54,7 +55,7 @@ var updateCmd = &cobra.Command{
 
 		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, pluginsList)
 		if err != nil {
-			logger.Fatal("while reading plugin configurations: ", err.Error())
+			log.Fatal("while reading plugin configurations: %s", err)
 		}
 
 		waitGroup := sync.WaitGroup{}

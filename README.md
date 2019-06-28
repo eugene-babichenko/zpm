@@ -137,21 +137,11 @@ This section contains the list of available configuration keys.
 - `Root` (`string`) - an absolute path at which `zpm` will install plugins. If
   left empty, the default location is `~/.zpm` on Linux and `~/Library/zpm` on
   macOS.
-- `LogsPath` (`string`) - an absolute path at which `zpm` will store logs. If
-  left empty, the default location is `~/.zpm/Logs` on Linux and
-  `~/Library/Logs/zpm` on macOS.
 - `UpdateCheckPeriod` (`string`) the period to check for updates. Used when
   `zpm check` is called with `--periodic`. Valid examples are `3h`, `30m`,
   `5h30m20s`. The default value `24h`.
-- `Logger` - logger settings
-  - `MaxSize` (`int`) - the maximum size of log files in megabytes. The default
-    is 500 MiB.
-  - `MaxAge` (`int`) - the maximum age of a log file in days. The default value
-    is 28.
-  - `MaxBackups` (`int`) - the maximum number of log files that are preserved
-    during log rotation. The default value is 6.
-  - `Level` (`string`) - logging level. Valid values are `debug`, `info`,
-    `error` and `fatal`. The default value is `info`.
+- `LogLevel` (`string`) - logging level. Valid values are `debug`, `info`,
+  `error` and `fatal`. The default value is `info`.
 
 ## Available commands
 

@@ -2,29 +2,23 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/config"
-	"github.com/pkg/errors"
+	"github.com/eugene-babichenko/zpm/log"
 
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"gopkg.in/yaml.v2"
 )
 
 var (
 	appConfigFile string
 	appConfig     config.Config
-
-	logger *zap.SugaredLogger
 
 	RootCmd = &cobra.Command{
 		Use:   "zpm [command]",
@@ -34,7 +28,7 @@ var (
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println("failed to execute the command:", err)
+		log.Fatal("failed to execute the command: %s", err)
 		os.Exit(1)
 	}
 }
@@ -53,8 +47,7 @@ func init() {
 func initConfig() {
 	home, err := homedir.Dir()
 	if err != nil {
-		fmt.Println("cannot access the home directory:", err)
-		os.Exit(1)
+		log.Fatal("cannot access the home directory: %s", err)
 	}
 
 	if appConfigFile == "" {
@@ -63,68 +56,44 @@ func initConfig() {
 
 	appConfigLocal, err := loadConfigOrCreateDefault(appConfigFile)
 	if err != nil {
-		fmt.Printf("failed to read the config: %s\n", err.Error())
-		os.Exit(1)
+		log.Fatal("failed to read the config: %s", err)
 	}
+
+	//noinspection GoNilness
 	appConfigLocal.Validate(home)
+	//noinspection GoNilness
 	appConfig = *appConfigLocal
 
 	if err := os.MkdirAll(appConfig.Root, os.ModePerm); err != nil && !os.IsExist(err) {
-		logger.Fatal("while creating github plugin object: ", err.Error())
+		log.Fatal("while creating github plugin object: %s", err)
 	}
 
-	level, err := getLoggingLevel(appConfig.Logger.Level)
+	level, err := getLoggingLevel(appConfig.LogLevel)
 	if err != nil {
-		fmt.Printf("failed to set the logging level: %s\n", err.Error())
+		log.Error("failed to set the logging level: %s", err)
+		return
 	}
 
-	fileLogger := &lumberjack.Logger{
-		Filename:   filepath.Join(appConfig.LogsPath, "zpm.log"),
-		MaxSize:    appConfig.Logger.MaxSize,
-		MaxAge:     appConfig.Logger.MaxAge,
-		MaxBackups: appConfig.Logger.MaxBackups,
-		LocalTime:  true,
-		Compress:   false,
-	}
-
-	encoderConfig := zap.NewDevelopmentEncoderConfig()
-	encoderConfig.EncodeTime = timeEncoder
-	encoderConfig.EncodeLevel = levelEncoder
-
-	core := zapcore.NewCore(
-		zapcore.NewConsoleEncoder(encoderConfig),
-		zapcore.AddSync(io.MultiWriter(os.Stdout, fileLogger)),
-		level,
-	)
-
-	logger = zap.New(core).Sugar()
+	log.SetLevel(level)
 }
 
-func getLoggingLevel(levelString string) (zapcore.Level, error) {
-	var level zapcore.Level
+func getLoggingLevel(levelString string) (log.Level, error) {
+	var level log.Level
 	switch levelString {
 	case "debug":
-		level = zap.DebugLevel
+		level = log.DebugLevel
 	case "info":
-		level = zap.InfoLevel
+		level = log.InfoLevel
 	case "error":
-		level = zap.ErrorLevel
+		level = log.ErrorLevel
 	case "fatal":
-		level = zap.FatalLevel
+		level = log.FatalLevel
 	case "":
-		level = zap.InfoLevel
+		level = log.InfoLevel
 	default:
 		return level, errors.New("invalid logging level specification")
 	}
 	return level, nil
-}
-
-func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(t.Format("Mon Jan 2 15:04:05 2006"))
-}
-
-func levelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString("[" + l.CapitalString() + "]")
 }
 
 func loadConfigOrCreateDefault(path string) (*config.Config, error) {

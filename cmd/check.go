@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/eugene-babichenko/zpm/log"
 	"github.com/eugene-babichenko/zpm/plugin"
 
 	"os"
@@ -26,7 +27,7 @@ period defined in the settings have passed since the last check.
 		if periodicCheck {
 			updateCheckPeriod, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
 			if err != nil {
-				logger.Fatal("failed to parse the update check period")
+				log.Fatal("failed to parse the update check period")
 			}
 
 			if readLastUpdateCheckTime().Add(updateCheckPeriod).After(time.Now()) {
@@ -36,7 +37,7 @@ period defined in the settings have passed since the last check.
 
 		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
-			logger.Fatal("while reading plugin configurations: ", err.Error())
+			log.Fatal("while reading plugin configurations: %s", err)
 			os.Exit(1)
 		}
 
@@ -60,12 +61,12 @@ period defined in the settings have passed since the last check.
 		waitGroup.Wait()
 
 		if updatesAvailable > 0 || installationsAvailable > 0 {
-			logger.Infof(
+			log.Info(
 				"%d updates available and %d plugins need to be installed",
 				updatesAvailable,
 				installationsAvailable,
 			)
-			logger.Info("You can run the update using `zpm update`.")
+			log.Info("You can run the update using `zpm update`.")
 		}
 
 		updateLastUpdateCheckTime()

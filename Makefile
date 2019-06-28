@@ -6,3 +6,6 @@ run:
 
 install:
 	go install
+
+test:
+	GO111MODULE=on go test -race -covermode=atomic -coverpkg=./... ./...

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/eugene-babichenko/zpm/log"
 	"github.com/eugene-babichenko/zpm/meta"
 	"github.com/eugene-babichenko/zpm/plugin"
 
@@ -19,13 +20,13 @@ func checkPluginUpdate(name string, pluginInstance plugin.Plugin) (*string, erro
 	update, err := pluginInstance.CheckUpdate()
 
 	if plugin.IsNotInstalled(err) {
-		logger.Info("not installed: ", name)
+		log.Info("not installed: %s", name)
 	} else if err != nil {
-		logger.Errorf("while checking for %s: %s", name, err.Error())
+		log.Error("while checking for %s: %s", name, err)
 	} else if update != nil {
-		logger.Infof("update available for %s: %s", name, *update)
+		log.Info("update available for %s: %s", name, *update)
 	} else {
-		logger.Debug("up to date: ", name)
+		log.Debug("up to date: %s", name)
 	}
 
 	return update, err
@@ -78,10 +79,10 @@ func updateLastUpdateCheckTime() {
 	}
 	newMetaJSON, err := json.Marshal(newMeta)
 	if err != nil {
-		logger.Fatal("failed to write down the meta file: ", err.Error())
+		log.Fatal("failed to write down the meta file: %s", err)
 	}
 	if err := ioutil.WriteFile(metaPath(), []byte(newMetaJSON), os.ModePerm); err != nil {
-		logger.Fatal("failed to write down the meta file: ", err.Error())
+		log.Fatal("failed to write down the meta file: %s", err)
 	}
 }
 
