@@ -60,3 +60,31 @@ func TestFileUpdate(t *testing.T) {
 	err = plugin.InstallUpdate()
 	assert.Equal(t, NotUpgradable, err, "the file plugin must not be upgradable")
 }
+
+//   Scenario: No path provided
+func TestFileMissingPath(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "")
+	require.Empty(t, err, "cannot create temp dir")
+
+	pluginFileName := filepath.Join(tempDir, "test.plugin.zsh")
+	_, err = os.Create(pluginFileName)
+	require.Empty(t, err, "cannot create test file")
+
+	_, err = MakeFile(tempDir, map[string]string{})
+	assert.NotEmpty(t, err, "must return error")
+}
+
+func TestFileNotAFile(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "")
+	require.Empty(t, err, "cannot create temp dir")
+
+	pluginFileName := filepath.Join(tempDir, "test.plugin.zsh")
+	err = os.Mkdir(pluginFileName, os.ModePerm)
+	require.Empty(t, err, "cannot create test dir")
+
+	pluginInstance, err := MakeFile(tempDir, map[string]string{"filename": "test.plugin.zsh"})
+	require.Empty(t, err, "cannot create a plugin")
+
+	_, _, err = (*pluginInstance).Load()
+	require.NotEmpty(t, err, "must return an error whentrying to load a dir instead of a file")
+}
