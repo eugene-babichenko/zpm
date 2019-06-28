@@ -120,3 +120,22 @@ func TestDirUpdate(t *testing.T) {
 	err = plugin.InstallUpdate()
 	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
 }
+
+//  Scenario: Missing path for plugin creation
+func TestMakePluginNoPath(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "")
+	require.Empty(t, err, "cannot create temp dir")
+
+	pluginDir := filepath.Join(tempDir, "plugin")
+	err = os.MkdirAll(pluginDir, os.ModePerm)
+	require.Empty(t, err, "cannot create plugin dir")
+
+	files := []string{"hello.plugin.zsh", "world.plugin.zsh", "impretty.zsh-theme"}
+	for _, filename := range files {
+		_, err = os.Create(filepath.Join(pluginDir, filename))
+		require.Empty(t, err, "cannot create plugin file")
+	}
+
+	_, err = MakeDir("", map[string]string{})
+	assert.NotEmpty(t, err, "must return error")
+}
