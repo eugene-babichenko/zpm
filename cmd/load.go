@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/eugene-babichenko/zpm/log"
+
 	"fmt"
 	"os"
 	"strings"
@@ -11,11 +13,11 @@ import (
 func loadCache() bool {
 	stat, err := os.Stat(cachePath())
 	if err != nil {
-		fmt.Println("# error reading cache", err.Error())
+		log.Error("error reading cache %s", err)
 		return false
 	}
 	if stat.Mode()&os.ModeType != 0 {
-		fmt.Println("# error reading cache: not a file")
+		log.Error("error reading cache: not a file")
 		return false
 	}
 	fmt.Printf("source " + cachePath())
@@ -36,7 +38,7 @@ var loadCmd = &cobra.Command{
 
 		_, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
-			fmt.Println("# cannot load plugins:", err.Error())
+			log.Error("cannot load plugins: %s", err)
 			os.Exit(1)
 		}
 
@@ -53,7 +55,7 @@ var loadCmd = &cobra.Command{
 		for _, plugin := range plugins {
 			fpathPlugin, execPlugin, err := plugin.Load()
 			if err != nil {
-				fmt.Println("# error loading plugin:", err.Error())
+				log.Error("error loading plugin: %s", err)
 				continue
 			}
 			fpath = append(fpath, fpathPlugin...)
@@ -81,14 +83,12 @@ var loadCmd = &cobra.Command{
 
 		cacheFile, err := os.Create(cachePath())
 		if err != nil {
-			fmt.Println("# cannot write cache:", err.Error())
-			os.Exit(1)
+			log.Fatal("cannot write cache: %s", err)
 		}
 
 		for _, line := range lines {
 			if _, err := fmt.Fprintln(cacheFile, line); err != nil {
-				fmt.Println("# cannot write cache:", err.Error())
-				os.Exit(1)
+				log.Fatal("cannot write cache: %s", err)
 			}
 		}
 	},
