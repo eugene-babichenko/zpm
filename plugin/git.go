@@ -47,20 +47,20 @@ func (p *Git) CheckUpdate() (message *string, err error) {
 
 	currentHead, err := p.repository.Head()
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot read chain head")
+		return nil, errors.Wrap(err, "cannot read repository HEAD")
 	}
 	if currentHead == nil {
-		return nil, errors.New("cannot read chain head")
+		return nil, errors.New("cannot read repository HEAD")
 	}
 
 	currentVersion := currentHead.Hash()
 
 	fetchOptions := git.FetchOptions{}
 	if err := fetchOptions.Validate(); err != nil {
-		return nil, errors.Wrap(err, "while fetching the repositoryName")
+		return nil, errors.Wrap(err, "while fetching the repository")
 	}
 	if err := p.repository.Fetch(&fetchOptions); err != nil && err != git.NoErrAlreadyUpToDate {
-		return nil, errors.Wrap(err, "while fetching the repositoryName")
+		return nil, errors.Wrap(err, "while fetching the repository")
 	}
 
 	// because we fetch, not pull, we need to check the remote branches
