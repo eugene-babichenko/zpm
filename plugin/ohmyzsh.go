@@ -38,7 +38,7 @@ func MakeOhMyZshPlugin(ohMyZshInstance OhMyZsh, params map[string]string) (*Plug
 func MakeOhMyZshTheme(ohMyZshInstance OhMyZsh, params map[string]string) (*Plugin, error) {
 	theme, themePrs := params["name"]
 	if !themePrs {
-		return nil, errors.New("missing plugin name")
+		return nil, errors.New("missing theme name")
 	}
 
 	ohMyZshTheme := Plugin(ohMyZshInstance.LoadTheme(theme))
