@@ -85,8 +85,8 @@ func (p *Git) CheckUpdate() (message *string, err error) {
 	updateString := fmt.Sprintf(
 		"%s: update from %s to %s",
 		p.requiredRevision,
-		currentVersion,
-		newVersion,
+		currentVersion.String()[:7],
+		newVersion.String()[:7],
 	)
 	p.update = newVersion
 
