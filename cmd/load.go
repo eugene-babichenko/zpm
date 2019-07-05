@@ -55,7 +55,7 @@ var loadCmd = &cobra.Command{
 				defer waitGroup.Done()
 
 				_, _, err := pluginInstance.Load()
-				shouldInstall := !(plugin.IsNotInstalled(err) && installMissing)
+				shouldInstall := plugin.IsNotInstalled(err) && installMissing
 
 				if !shouldInstall && !shouldCheckUpdate {
 					return
