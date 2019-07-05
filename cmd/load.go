@@ -13,20 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func loadCache() bool {
-	stat, err := os.Stat(cachePath())
-	if err != nil {
-		log.Debug("while reading cache %s", err)
-		return false
-	}
-	if stat.Mode()&os.ModeType != 0 {
-		log.Debug("while reading cache: not a file")
-		return false
-	}
-	fmt.Printf("source " + cachePath())
-	return true
-}
-
 var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
@@ -84,14 +70,6 @@ var loadCmd = &cobra.Command{
 
 		waitGroup.Wait()
 
-		noCache, _ := cmd.Flags().GetBool("no-cache")
-
-		if !noCache {
-			if loadCache() {
-				return
-			}
-		}
-
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
 
@@ -126,31 +104,10 @@ var loadCmd = &cobra.Command{
 		for _, line := range lines {
 			fmt.Println(line)
 		}
-
-		if noCache {
-			return
-		}
-
-		cacheFile, err := os.Create(cachePath())
-		if err != nil {
-			log.Fatal("cannot write cache: %s", err)
-		}
-
-		for _, line := range lines {
-			if _, err := fmt.Fprintln(cacheFile, line); err != nil {
-				log.Fatal("cannot write cache: %s", err)
-			}
-		}
 	},
 }
 
 func init() {
-	loadCmd.Flags().Bool(
-		"no-cache",
-		false,
-		"Do not use and set cache when loading plugins.",
-	)
-
 	loadCmd.Flags().Bool(
 		"update-check",
 		false,

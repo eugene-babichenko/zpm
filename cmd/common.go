@@ -66,10 +66,6 @@ func MakePluginsFromSpecs(
 	return names, plugins, nil
 }
 
-func cachePath() string {
-	return filepath.Join(appConfig.Root, "cache-"+Version+".zsh")
-}
-
 func metaPath() string {
 	return filepath.Join(appConfig.Root, "meta.json")
 }

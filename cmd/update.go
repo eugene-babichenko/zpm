@@ -4,7 +4,6 @@ import (
 	"github.com/eugene-babichenko/zpm/log"
 	"github.com/eugene-babichenko/zpm/plugin"
 
-	"os"
 	"sync"
 
 	"github.com/spf13/cobra"
@@ -42,11 +41,6 @@ var updateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		onlyMissing, _ := cmd.Flags().GetBool("only-missing")
 		pluginToCheck, _ := cmd.Flags().GetString("plugin")
-
-		log.Debug("invalidating cache...")
-		if err := os.RemoveAll(cachePath()); err != nil {
-			log.Error("while invalidating cache: %s", err)
-		}
 
 		var pluginsList []string
 

@@ -37,7 +37,6 @@ This project is largely influenced by [Antigen][antigen] and
   - [Installing and updating plugins](#installing-and-updating-plugins)
 - [Configuration](#configuration)
 - [Available commands](#available-commands)
-- [Caching](#caching)
 - [Contributing](#contributing)
 
 ## Getting Started
@@ -141,13 +140,6 @@ This section contains the list of available configuration keys.
 ## Available commands
 
 Run `zpm help` to get the full list of available commands and their flags.
-
-## Caching
-
-`zpm` caches the script that loads plugins for faster loading. This behavior
-can be disabled by running `zpm load` with `--no-cache`. The cache is located in
-the `zpm` plugins root directory and is reset when plugins or `zpm` itself are
-updated.
 
 ## Contributing
 
