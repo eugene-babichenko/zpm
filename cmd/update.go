@@ -27,7 +27,7 @@ func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 			return
 		}
 		log.Info("updated: %s", name)
-	} else if err != nil {
+	} else if err != nil && err != plugin.NotUpgradable && err != plugin.UpToDate {
 		log.Error("error while checking for an update: %s", err)
 	}
 }
