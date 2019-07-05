@@ -17,9 +17,9 @@ var loaders = []struct {
 	Loader func(string, map[string]string) (*Plugin, error)
 	Regex  *regexp.Regexp
 }{
-	{MakeGitHub, regexp.MustCompile(`^github:(?P<username>[a-z0-9\-]+)/(?P<repo>[a-z0-9\-]+)(@(?P<version>.+))?$`)},
-	{MakeDir, regexp.MustCompile(`^dir:(?P<directory>.*)$`)},
-	{MakeFile, regexp.MustCompile(`^file:(?P<filename>.*)$`)},
+	{MakeGitHub, regexp.MustCompile(`^github\.com/(?P<username>[a-z0-9\-]+)/(?P<repo>[a-z0-9\-]+)(@(?P<version>.+))?$`)},
+	{MakeDir, regexp.MustCompile(`^dir://(?P<directory>.*)$`)},
+	{MakeFile, regexp.MustCompile(`^file://(?P<filename>.*)$`)},
 }
 
 var ohMyZshRegex = regexp.MustCompile(`^oh-my-zsh(@(?P<version>.+))?$`)
@@ -28,8 +28,8 @@ var ohMyZshLoaders = []struct {
 	Loader func(OhMyZsh, map[string]string) (*Plugin, error)
 	Regex  *regexp.Regexp
 }{
-	{MakeOhMyZshPlugin, regexp.MustCompile(`^oh-my-zsh:plugin:(?P<name>[a-z0-9\-]+)$`)},
-	{MakeOhMyZshTheme, regexp.MustCompile(`^oh-my-zsh:theme:(?P<name>[a-z0-9\-]+)$`)},
+	{MakeOhMyZshPlugin, regexp.MustCompile(`^oh-my-zsh/plugin/(?P<name>[a-z0-9\-]+)$`)},
+	{MakeOhMyZshTheme, regexp.MustCompile(`^oh-my-zsh/theme/(?P<name>[a-z0-9\-]+)$`)},
 }
 
 type Factory struct {

@@ -74,20 +74,20 @@ Here is an example configuration:
 
 ```yaml
 Plugins:
-- github:zsh-users/zsh-autosuggestions
-- github:mafredri/zsh-async
-- github:sindresorhus/pure
-- oh-my-zsh:plugin:colored-man-pages
+- github.com/zsh-users/zsh-autosuggestions
+- github.com/mafredri/zsh-async
+- github.com/sindresorhus/pure
+- oh-my-zsh/plugin/colored-man-pages
 ```
 
 You can specify a plugin version if required. Branch names, tags and commit
 hashes are acceptable. This is available for plugins installed from GitHub and
-for `"oh-my-zsh"` plugin line (not for `"oh-my-zsh:plugin:*"` and
-`"oh-my-zsh:theme:*"`!):
+for `"oh-my-zsh"` plugin line (not for `"oh-my-zsh/plugin/*"` and
+`"oh-my-zsh/theme/*"`!):
 
 ```yaml
 Plugins:
-- github:marzocchi/zsh-notify@v1.0
+- github.com/marzocchi/zsh-notify@v1.0
 - oh-my-zsh@ea3e666e04bfae31b37ef42dfe54801484341e46
 ```
 
@@ -96,25 +96,25 @@ JSON is also possible:
 ```json
 {
   "Plugins": [
-    "github:zsh-users/zsh-autosuggestions",
-    "github:mafredri/zsh-async",
-    "github:sindresorhus/pure",
-    "oh-my-zsh:plugin:colored-man-pages"
+    "github.com/zsh-users/zsh-autosuggestions",
+    "github.com/mafredri/zsh-async",
+    "github.com/sindresorhus/pure",
+    "oh-my-zsh/plugin/colored-man-pages"
   ]
 }
 ```
 
 Possible patterns for adding the plugins are:
 
-- `github:username/repo` for adding plugins from GitHub repositories;
-- `dir:path/to/plugin` for adding local plugins. Note that the path must be
+- `github.com/username/repo` for adding plugins from GitHub repositories;
+- `dir://path/to/plugin` for adding local plugins. Note that the path must be
   relative to the `zsh` plugins directory (see [Configuration](#configuration)).
-- `file:path/to/file` for plugins consisting of a single file. Note that the
+- `file://path/to/file` for plugins consisting of a single file. Note that the
   path must be relative to the `zsh` plugins directory (see
   [Configuration](#configuration)).
 - `oh-my-zsh` to load Oh My Zsh from GitHub (it is treated specially);
-  - `oh-my-zsh:plugin:*` to load one of the plugins bundled with Oh My Zsh;
-  - `oh-my-zsh:themes:*` to load one of the themes bundled with Oh My Zsh;
+  - `oh-my-zsh/plugin/*` to load one of the plugins bundled with Oh My Zsh;
+  - `oh-my-zsh/themes/*` to load one of the themes bundled with Oh My Zsh;
 
 ### Installing and updating plugins
 

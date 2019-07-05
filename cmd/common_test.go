@@ -15,14 +15,14 @@ import (
 //     And be the first
 func TestLoadPluginWithOhMyZsh(t *testing.T) {
 	var specs = []string{
-		"github:zsh-users/zsh-autosuggestions",
-		"oh-my-zsh:plugin:pip",
+		"github.com/zsh-users/zsh-autosuggestions",
+		"oh-my-zsh/plugin/pip",
 	}
 
 	var expectedNames = []string{
 		"oh-my-zsh",
-		"github:zsh-users/zsh-autosuggestions",
-		"oh-my-zsh:plugin:pip",
+		"github.com/zsh-users/zsh-autosuggestions",
+		"oh-my-zsh/plugin/pip",
 	}
 
 	names, _, err := MakePluginsFromSpecs("/root", specs)
@@ -37,14 +37,14 @@ func TestLoadPluginWithOhMyZsh(t *testing.T) {
 //     And be the first
 func TestLoadThemeWithOhMyZsh(t *testing.T) {
 	var specs = []string{
-		"github:zsh-users/zsh-autosuggestions",
-		"oh-my-zsh:theme:arrow",
+		"github.com/zsh-users/zsh-autosuggestions",
+		"oh-my-zsh/theme/arrow",
 	}
 
 	var expectedNames = []string{
 		"oh-my-zsh",
-		"github:zsh-users/zsh-autosuggestions",
-		"oh-my-zsh:theme:arrow",
+		"github.com/zsh-users/zsh-autosuggestions",
+		"oh-my-zsh/theme/arrow",
 	}
 
 	names, _, err := MakePluginsFromSpecs("/root", specs)
@@ -59,13 +59,13 @@ func TestLoadThemeWithOhMyZsh(t *testing.T) {
 //     And be the first
 func TestLoadOhMyZsh(t *testing.T) {
 	var specs = []string{
-		"github:zsh-users/zsh-autosuggestions",
+		"github.com/zsh-users/zsh-autosuggestions",
 		"oh-my-zsh",
 	}
 
 	var expectedNames = []string{
 		"oh-my-zsh",
-		"github:zsh-users/zsh-autosuggestions",
+		"github.com/zsh-users/zsh-autosuggestions",
 	}
 
 	names, _, err := MakePluginsFromSpecs("/root", specs)
