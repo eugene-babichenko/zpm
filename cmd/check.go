@@ -7,7 +7,6 @@ import (
 	"os"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -15,26 +14,7 @@ import (
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check for updates",
-	Long: `
-Check if there are any updates available.
-
-Adding --periodic will cause the command to check for updates only after a
-period defined in the settings have passed since the last check.
-`,
 	Run: func(cmd *cobra.Command, args []string) {
-		periodicCheck, _ := cmd.Flags().GetBool("periodic")
-
-		if periodicCheck {
-			updateCheckPeriod, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
-			if err != nil {
-				log.Fatal("failed to parse the update check period")
-			}
-
-			if readLastUpdateCheckTime().Add(updateCheckPeriod).After(time.Now()) {
-				return
-			}
-		}
-
 		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
@@ -74,11 +54,5 @@ period defined in the settings have passed since the last check.
 }
 
 func init() {
-	checkCmd.Flags().Bool(
-		"periodic",
-		false,
-		"Check only once in a period defined in the settings (default: 24h)",
-	)
-
 	RootCmd.AddCommand(checkCmd)
 }

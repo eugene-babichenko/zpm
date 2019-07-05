@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/log"
+	"github.com/eugene-babichenko/zpm/plugin"
 
 	"fmt"
 	"os"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -28,18 +31,65 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
+		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
+		if err != nil {
+			log.Error("cannot load plugins: %s", err)
+			os.Exit(1)
+		}
+
+		updateCheck, _ := cmd.Flags().GetBool("update-check")
+		installMissing, _ := cmd.Flags().GetBool("install-missing")
+
+		updateCheckPeriod, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
+		if err != nil {
+			log.Fatal("failed to parse the update check period")
+		}
+
+		shouldCheckUpdate := updateCheck && readLastUpdateCheckTime().Add(updateCheckPeriod).Before(time.Now())
+
+		waitGroup := sync.WaitGroup{}
+		waitGroup.Add(len(plugins))
+
+		for idx, pluginInstance := range plugins {
+			go func(name string, pluginInstance plugin.Plugin) {
+				defer waitGroup.Done()
+
+				_, _, err := pluginInstance.Load()
+				shouldInstall := !(plugin.IsNotInstalled(err) && installMissing)
+
+				if !shouldInstall && !shouldCheckUpdate {
+					return
+				}
+
+				update, err := pluginInstance.CheckUpdate()
+
+				if plugin.IsNotInstalled(err) && installMissing {
+					log.Info("installing: %s", name)
+					if err := pluginInstance.InstallUpdate(); err != nil {
+						log.Error("while installing %s: %s", name, err.Error())
+						return
+					}
+					log.Info("installed: %s", name)
+				} else if update != nil && shouldCheckUpdate {
+					log.Info("update available for %s: %s", name, *update)
+				} else if err != nil && err != plugin.NotUpgradable && err != plugin.UpToDate {
+					log.Error("while checking for an update: %s", err)
+				}
+			}(names[idx], pluginInstance)
+		}
+
+		if shouldCheckUpdate {
+			updateLastUpdateCheckTime()
+		}
+
+		waitGroup.Wait()
+
 		noCache, _ := cmd.Flags().GetBool("no-cache")
 
 		if !noCache {
 			if loadCache() {
 				return
 			}
-		}
-
-		_, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
-		if err != nil {
-			log.Error("cannot load plugins: %s", err)
-			os.Exit(1)
 		}
 
 		fpath := make([]string, 0)
@@ -98,7 +148,19 @@ func init() {
 	loadCmd.Flags().Bool(
 		"no-cache",
 		false,
-		"Do not use and set cache when loading plugins",
+		"Do not use and set cache when loading plugins.",
+	)
+
+	loadCmd.Flags().Bool(
+		"update-check",
+		false,
+		"Check for updates once in a period defined in the settings (default: 24h).",
+	)
+
+	loadCmd.Flags().Bool(
+		"install-missing",
+		false,
+		"Install plugins that are listed in the configuration but are not installed.",
 	)
 
 	RootCmd.AddCommand(loadCmd)
