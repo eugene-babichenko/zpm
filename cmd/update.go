@@ -20,7 +20,7 @@ func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 	if plugin.IsNotInstalled(err) {
 		log.Info("installing: %s", name)
 		if err := pluginInstance.InstallUpdate(); err != nil {
-			log.Error("installation error for %s: %s", name, err.Error())
+			log.Error("while installing %s: %s", name, err.Error())
 			return
 		}
 		log.Info("installed: %s", name)
@@ -32,7 +32,7 @@ func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
 		}
 		log.Info("updated: %s", name)
 	} else if err != nil && err != plugin.NotUpgradable && err != plugin.UpToDate {
-		log.Error("error while checking for an update: %s", err)
+		log.Error("while checking for an update: %s", err)
 	}
 }
 

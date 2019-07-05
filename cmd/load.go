@@ -13,11 +13,11 @@ import (
 func loadCache() bool {
 	stat, err := os.Stat(cachePath())
 	if err != nil {
-		log.Error("error reading cache %s", err)
+		log.Debug("while reading cache %s", err)
 		return false
 	}
 	if stat.Mode()&os.ModeType != 0 {
-		log.Error("error reading cache: not a file")
+		log.Debug("while reading cache: not a file")
 		return false
 	}
 	fmt.Printf("source " + cachePath())
@@ -55,7 +55,7 @@ var loadCmd = &cobra.Command{
 		for _, plugin := range plugins {
 			fpathPlugin, execPlugin, err := plugin.Load()
 			if err != nil {
-				log.Error("error loading plugin: %s", err)
+				log.Error("while loading plugin: %s", err)
 				continue
 			}
 			fpath = append(fpath, fpathPlugin...)
