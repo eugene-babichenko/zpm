@@ -1,22 +1,10 @@
-* [ ] Logging
-  * [x] Sane log format
-  * [ ] Logs in the terminal when loading
-  * [x] Log files
-* [x] Cache: handle software updates
-  * [x] Own cache
-  * [x] Completion cache
-* [x] Allow to work w/o the cache
 * [ ] Check for updates on load
   * [x] Install new plugins
   * [x] Prompt to install updates
   * [x] Check for zpm updates
   * [x] Allow to set check period (1 hour, 1 day, etc)
   * [ ] Async check: load shell immediately, check in the background and show a system notification
-* [x] Settings
-  * [x] Use `$HOME/Library` instead of `$HOME` by default on macOS
-  * [x] Allow to specify a package version (branch, tag, git commit)
 * [ ] Plugin management CLI (CRUD)
 * [ ] Allow loading plugins without installing them
 * [ ] Purge plugins directory
-* [x] ZSH completions for the own command
 * [ ] Publish in binary repositories
