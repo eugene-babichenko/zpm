@@ -10,7 +10,7 @@ import (
 )
 
 func update(name string, pluginInstance plugin.Plugin, onlyMissing bool) {
-	if _, _, err := pluginInstance.Load(); !(plugin.IsNotInstalled(err) && onlyMissing) {
+	if _, _, err := pluginInstance.Load(); plugin.IsNotInstalled(err) && onlyMissing {
 		return
 	}
 
