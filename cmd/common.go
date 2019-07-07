@@ -6,6 +6,7 @@ import (
 	"github.com/eugene-babichenko/zpm/plugin"
 
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -46,7 +47,8 @@ func MakePluginsFromSpecs(
 	for _, pluginSpec := range pluginSpecs {
 		p, isDependency, err := factory.MakePlugin(pluginSpec)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "while loading plugins")
+			msg := fmt.Sprintf("while loading plugin %s", pluginSpec)
+			return nil, nil, errors.Wrap(err, msg)
 		}
 		// Oh My Zsh is required to be inserted in the beginning of the plugin
 		// load sequence.
