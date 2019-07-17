@@ -59,7 +59,7 @@ var loadCmd = &cobra.Command{
 				} else if update != nil && shouldCheckUpdate {
 					log.Info("update available for %s: %s", name, *update)
 				} else if err != nil && err != plugin.NotUpgradable && err != plugin.UpToDate {
-					log.Error("while checking for an update: %s", err)
+					log.Error("while checking for an update for %s: %s", name, err)
 				}
 			}(names[idx], pluginInstance)
 		}
