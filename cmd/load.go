@@ -40,6 +40,8 @@ var loadCmd = &cobra.Command{
 		waitGroup := sync.WaitGroup{}
 		waitGroup.Add(len(plugins))
 
+		checkSuccessful := true
+
 		for idx, pluginInstance := range plugins {
 			go func(name string, pluginInstance plugin.Plugin) {
 				defer waitGroup.Done()
@@ -69,13 +71,14 @@ var loadCmd = &cobra.Command{
 					atomic.AddInt32(&updatesAvailable, 1)
 				} else if err != nil && err != plugin.NotUpgradable && err != plugin.UpToDate {
 					log.Error("while checking for an update: %s", err)
+					checkSuccessful = false
 				}
 			}(names[idx], pluginInstance)
 		}
 
 		waitGroup.Wait()
 
-		if shouldCheckUpdate {
+		if shouldCheckUpdate && checkSuccessful {
 			updateLastUpdateCheckTime()
 		}
 
