@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/log"
+	"github.com/eugene-babichenko/zpm/meta"
 
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -29,7 +31,15 @@ var loadCmd = &cobra.Command{
 			log.Fatal("failed to parse the update check period")
 		}
 
-		shouldCheckUpdate := updateCheck && readLastUpdateCheckTime().Add(updateCheckPeriod).Before(time.Now())
+		var metaData meta.Meta
+		metaFile, err := ioutil.ReadFile(metaPath())
+		if err == nil {
+			if metaData_, err := meta.Unmarshal(metaFile); err == nil {
+				metaData = *metaData_
+			}
+		}
+
+		shouldCheckUpdate := updateCheck && metaData.LastUpdateCheck.Add(updateCheckPeriod).Before(time.Now())
 
 		if shouldCheckUpdate {
 			checkAndInstallUpdates(names, plugins, false, installMissing)

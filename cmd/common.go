@@ -5,7 +5,6 @@ import (
 	"github.com/eugene-babichenko/zpm/meta"
 	"github.com/eugene-babichenko/zpm/plugin"
 
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -114,7 +113,18 @@ func checkAndInstallUpdates(
 	}
 
 	if allChecksSuccessful {
-		updateLastUpdateCheckTime()
+		meta := meta.Meta{
+			LastUpdateCheck:       time.Now(),
+			UpdatesAvailable:      updatesAvailable,
+			InstallationsRequired: installationsAvailable,
+		}
+		newMetaJSON, err := meta.Marshal()
+		if err != nil {
+			log.Fatal("failed to encode the meta file: %s", err)
+		}
+		if err := ioutil.WriteFile(metaPath(), []byte(newMetaJSON), os.ModePerm); err != nil {
+			log.Fatal("failed to write down the meta file: %s", err)
+		}
 	}
 }
 
@@ -153,32 +163,4 @@ func MakePluginsFromSpecs(
 
 func metaPath() string {
 	return filepath.Join(appConfig.Root, "meta.json")
-}
-
-// Update the last time of check for updates.
-func updateLastUpdateCheckTime() {
-	newMeta := meta.Meta{
-		LastUpdateCheck: time.Now().Format(meta.LastUpdateCheckLayout),
-	}
-	newMetaJSON, err := json.Marshal(newMeta)
-	if err != nil {
-		log.Fatal("failed to write down the meta file: %s", err)
-	}
-	if err := ioutil.WriteFile(metaPath(), []byte(newMetaJSON), os.ModePerm); err != nil {
-		log.Fatal("failed to write down the meta file: %s", err)
-	}
-}
-
-func readLastUpdateCheckTime() time.Time {
-	var lastUpdateCheckTime time.Time
-	metaFile, err := ioutil.ReadFile(metaPath())
-	if err != nil {
-		return lastUpdateCheckTime
-	}
-	var metaData meta.Meta
-	if err := json.Unmarshal(metaFile, &metaData); err != nil {
-		return lastUpdateCheckTime
-	}
-	lastUpdateCheckTime, _ = time.Parse(meta.LastUpdateCheckLayout, metaData.LastUpdateCheck)
-	return lastUpdateCheckTime
 }
