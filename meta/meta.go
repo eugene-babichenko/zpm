@@ -12,8 +12,8 @@ const lastUpdateCheckLayout string = "Mon Jan 2 15:04:05 2006"
 
 // Internal data required for `zpm` functioning.
 type metaDto struct {
-	LastUpdateCheck string
-	UpdatesAvailable int32
+	LastUpdateCheck       string
+	UpdatesAvailable      int32
 	InstallationsRequired int32
 }
 
@@ -28,8 +28,8 @@ type Meta struct {
 
 func (m Meta) Marshal() ([]byte, error) {
 	dto := metaDto{
-		LastUpdateCheck: m.LastUpdateCheck.Format(lastUpdateCheckLayout),
-		UpdatesAvailable: m.UpdatesAvailable,
+		LastUpdateCheck:       m.LastUpdateCheck.Format(lastUpdateCheckLayout),
+		UpdatesAvailable:      m.UpdatesAvailable,
 		InstallationsRequired: m.InstallationsRequired,
 	}
 
@@ -58,8 +58,8 @@ func Unmarshal(data []byte) (*Meta, error) {
 	}
 
 	result := &Meta{
-		LastUpdateCheck: lastUpdateCheck,
-		UpdatesAvailable: dto.UpdatesAvailable,
+		LastUpdateCheck:       lastUpdateCheck,
+		UpdatesAvailable:      dto.UpdatesAvailable,
 		InstallationsRequired: dto.InstallationsRequired,
 	}
 

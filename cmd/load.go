@@ -43,6 +43,15 @@ var loadCmd = &cobra.Command{
 
 		if shouldCheckUpdate {
 			checkAndInstallUpdates(names, plugins, false, installMissing)
+		} else {
+			if metaData.UpdatesAvailable > 0 || metaData.InstallationsRequired > 0 {
+				log.Info(
+					"%d updates available and %d plugins need to be installed.",
+					metaData.UpdatesAvailable,
+					metaData.InstallationsRequired,
+				)
+				log.Info("You can run the update using `zpm update`.")
+			}
 		}
 
 		fpath := make([]string, 0)
