@@ -42,7 +42,7 @@ var loadCmd = &cobra.Command{
 		shouldCheckUpdate := updateCheck && metaData.LastUpdateCheck.Add(updateCheckPeriod).Before(time.Now())
 
 		if shouldCheckUpdate {
-			checkAndInstallUpdates(names, plugins, false, installMissing)
+			checkAndInstallUpdates(names, plugins, false, installMissing, true)
 		} else {
 			if metaData.UpdatesAvailable > 0 || metaData.InstallationsRequired > 0 {
 				log.Info(

@@ -18,7 +18,7 @@ var checkCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		checkAndInstallUpdates(names, plugins, false, false)
+		checkAndInstallUpdates(names, plugins, false, false, false)
 	},
 }
 

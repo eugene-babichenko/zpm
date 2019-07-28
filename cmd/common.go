@@ -75,6 +75,7 @@ func checkAndInstallUpdates(
 	plugins []plugin.Plugin,
 	installUpdates bool,
 	installMissing bool,
+	ignoreFailure bool,
 ) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(len(plugins))
@@ -112,7 +113,7 @@ func checkAndInstallUpdates(
 		log.Info("Everything is up to date.")
 	}
 
-	if allChecksSuccessful {
+	if allChecksSuccessful || ignoreFailure {
 		meta := meta.Meta{
 			LastUpdateCheck:       time.Now(),
 			UpdatesAvailable:      updatesAvailable,

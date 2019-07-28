@@ -27,7 +27,7 @@ var updateCmd = &cobra.Command{
 			log.Fatal("while reading plugin configurations: %s", err)
 		}
 
-		checkAndInstallUpdates(names, plugins, !onlyMissing, true)
+		checkAndInstallUpdates(names, plugins, !onlyMissing, true, false)
 	},
 }
 
