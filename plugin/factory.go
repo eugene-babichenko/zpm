@@ -19,7 +19,6 @@ var loaders = []struct {
 }{
 	{MakeGitHub, regexp.MustCompile(`^github\.com/(?P<username>[a-z0-9\-]+)/(?P<repo>[a-z0-9\-]+)(@(?P<version>.+))?$`)},
 	{MakeDir, regexp.MustCompile(`^dir://(?P<directory>.*)$`)},
-	{MakeFile, regexp.MustCompile(`^file://(?P<filename>.*)$`)},
 }
 
 var ohMyZshRegex = regexp.MustCompile(`^oh-my-zsh(@(?P<version>.+))?$`)

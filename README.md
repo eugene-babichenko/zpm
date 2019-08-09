@@ -109,9 +109,6 @@ Possible patterns for adding the plugins are:
 - `github.com/username/repo` for adding plugins from GitHub repositories;
 - `dir://path/to/plugin` for adding local plugins. Note that the path must be
   relative to the `zsh` plugins directory (see [Configuration](#configuration)).
-- `file://path/to/file` for plugins consisting of a single file. Note that the
-  path must be relative to the `zsh` plugins directory (see
-  [Configuration](#configuration)).
 - `oh-my-zsh` to load Oh My Zsh from GitHub (it is treated specially);
   - `oh-my-zsh/plugin/*` to load one of the plugins bundled with Oh My Zsh;
   - `oh-my-zsh/themes/*` to load one of the themes bundled with Oh My Zsh;
