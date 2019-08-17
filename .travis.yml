@@ -9,7 +9,7 @@ os:
 
 cache:
   directories:
-    - $HOME/gopath
+    - $GOPATH/pkg/mod
 
 script:
   - GO111MODULE=on go test -race -coverprofile=coverage.txt -covermode=atomic -coverpkg=./... ./...
