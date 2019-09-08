@@ -99,6 +99,8 @@ func (ps *pluginStorage) checkPluginUpdates() {
 			if plugin.IsNotInstalled(err) {
 				log.Info("not installed: %s", pse.name)
 				ps.plugins[i].state = pluginNeedInstall
+			} else if err != plugin.NotInstallable {
+				log.Debug("plugin %s is not installable", pse.name)
 			} else if plugin.IsNotUpgradable(err) {
 				log.Debug("plugin %s is not upgradable", pse.name)
 				ps.plugins[i].state = pluginInstalled
@@ -128,20 +130,18 @@ func (ps *pluginStorage) checkPluginUpdates() {
 func (ps *pluginStorage) checkPluginInstalls() {
 	for i, pse := range ps.plugins {
 		isInstalled, err := pse.plugin.IsInstalled()
-		if err != nil && err != plugin.NotInstalled {
+		if err != nil && err != plugin.NotInstalled && err != plugin.NotInstallable {
 			log.Error("while checking for %s: %s", pse.name, err)
 			ps.plugins[i].state = pluginCheckError
 			ps.plugins[i].errorState = &err
 			ps.plugins[i].updateState = nil
-		} else if !isInstalled {
+		} else if !isInstalled && err != plugin.NotInstallable {
 			log.Info("not installed: %s", pse.name)
 			ps.plugins[i].state = pluginNeedInstall
 			ps.plugins[i].errorState = nil
 			ps.plugins[i].updateState = nil
 		}
 	}
-
-	log.Info("plugins: %v", ps.plugins)
 }
 
 func (ps *pluginStorage) updateAll() {
@@ -183,7 +183,7 @@ func (ps *pluginStorage) installAll() {
 			defer waitGroup.Done()
 
 			if pse.state != pluginNeedInstall {
-				log.Info("this plugin is not required to be installed: %s", pse.name)
+				log.Debug("this plugin is not required to be installed: %s", pse.name)
 				return
 			}
 
