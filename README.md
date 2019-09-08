@@ -125,9 +125,6 @@ This section contains the list of available configuration keys.
 
 - `Plugins` (`[string]`) - the list of plugin specifications. The format for
   specifications is described in [Configuring plugins](#configuring-plugins).
-- `Root` (`string`) - an absolute path at which `zpm` will install plugins. If
-  left empty, the default location is `~/.zpm` on Linux and `~/Library/zpm` on
-  macOS.
 - `UpdateCheckPeriod` (`string`) the period to check for updates. Used when
   `zpm check` is called with `--periodic`. Valid examples are `3h`, `30m`,
   `5h30m20s`. The default value `24h`.
