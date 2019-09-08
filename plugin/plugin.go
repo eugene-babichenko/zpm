@@ -14,6 +14,8 @@ var NotUpgradable = errors.New("this plugin is not upgradable")
 // is up to date.
 var UpToDate = errors.New("up to date")
 
+var NotInstallable = errors.New("this plugin cannot be installed from the external source")
+
 // Check if a plugin is not installed with the error value of
 // `Plugin.CheckUpdate`.
 func IsNotInstalled(err error) bool {
@@ -48,4 +50,6 @@ type Plugin interface {
 	// description or the `NotInstalled` error). Otherwise it may cause a panic
 	// or an unexpected error.
 	InstallUpdate() error
+	// IsInstalled checks if the plugin is actually installed.
+	IsInstalled() (installed bool, err error)
 }

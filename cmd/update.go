@@ -20,12 +20,14 @@ var updateCmd = &cobra.Command{
 			pluginsList = appConfig.Plugins
 		}
 
-		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, pluginsList)
+		ps, err := makePluginStorage(appConfig.Root, pluginsList)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
+			return
 		}
 
-		checkAndInstallUpdates(names, plugins, true, false, false)
+		ps.checkPluginUpdates()
+		ps.updateAll()
 	},
 }
 

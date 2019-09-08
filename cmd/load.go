@@ -2,13 +2,9 @@ package cmd
 
 import (
 	"github.com/eugene-babichenko/zpm/log"
-	"github.com/eugene-babichenko/zpm/meta"
 
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -17,42 +13,12 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
-		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
-		if err != nil {
-			log.Error("cannot load plugins: %s", err)
-			os.Exit(1)
-		}
+		// updateCheck, _ := cmd.Flags().GetBool("update-check")
+		// installMissing, _ := cmd.Flags().GetBool("install-missing")
 
-		updateCheck, _ := cmd.Flags().GetBool("update-check")
-		installMissing, _ := cmd.Flags().GetBool("install-missing")
-
-		updateCheckPeriod, err := time.ParseDuration(appConfig.UpdateCheckPeriod)
-		if err != nil {
-			log.Fatal("failed to parse the update check period")
-		}
-
-		var metaData meta.Meta
-		metaFile, err := ioutil.ReadFile(metaPath())
-		if err == nil {
-			if metaData_, err := meta.Unmarshal(metaFile); err == nil {
-				metaData = *metaData_
-			}
-		}
-
-		shouldCheckUpdate := updateCheck && metaData.LastUpdateCheck.Add(updateCheckPeriod).Before(time.Now())
-
-		if shouldCheckUpdate {
-			checkAndInstallUpdates(names, plugins, false, installMissing, true)
-		} else {
-			if metaData.UpdatesAvailable > 0 || metaData.InstallationsRequired > 0 {
-				log.Info(
-					"%d updates available and %d plugins need to be installed.",
-					metaData.UpdatesAvailable,
-					metaData.InstallationsRequired,
-				)
-				log.Info("You can run the update using `zpm update`.")
-			}
-		}
+		// TODO parallel update check
+		// TODO print out meta data with hints about updates
+		// TODO install missing plugins when the flag is enabled
 
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
@@ -64,8 +30,14 @@ var loadCmd = &cobra.Command{
 			"autoload -U compaudit compinit",
 		}
 
-		for _, plugin := range plugins {
-			fpathPlugin, execPlugin, err := plugin.Load()
+		ps, err := makePluginStorage(appConfig.Root, appConfig.Plugins)
+		if err != nil {
+			log.Fatal("while reading plugin configurations: %s", err)
+			return
+		}
+
+		for _, pse := range ps.plugins {
+			fpathPlugin, execPlugin, err := pse.plugin.Load()
 			if err != nil {
 				log.Error("while loading plugin: %s", err)
 				continue

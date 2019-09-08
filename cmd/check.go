@@ -3,8 +3,6 @@ package cmd
 import (
 	"github.com/eugene-babichenko/zpm/log"
 
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -12,13 +10,13 @@ var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Check for updates",
 	Run: func(cmd *cobra.Command, args []string) {
-		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, appConfig.Plugins)
+		ps, err := makePluginStorage(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
-			os.Exit(1)
+			return
 		}
 
-		checkAndInstallUpdates(names, plugins, false, false, false)
+		ps.checkPluginUpdates()
 	},
 }
 

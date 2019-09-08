@@ -2,10 +2,10 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -119,4 +119,14 @@ func (p *Git) InstallUpdate() error {
 	}
 
 	return worktree.Checkout(&git.CheckoutOptions{Hash: *p.update})
+}
+
+func (p *Git) IsInstalled() (installed bool, err error) {
+	p.repository, err = git.PlainOpen(p.Dir.Path)
+	if err == git.ErrRepositoryNotExists {
+		return false, NotInstalled
+	} else if err != nil {
+		return false, errors.Wrap(err, "while opening the repository")
+	}
+	return true, nil
 }

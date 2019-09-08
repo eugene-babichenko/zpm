@@ -47,10 +47,12 @@ func (p Dir) Load() (fpath []string, exec []string, err error) {
 	entrypoints = append(entrypoints, themes...)
 
 	for _, entrypoint := range entrypoints {
-		if stat, err = os.Stat(entrypoint); err == nil {
-			if stat.Mode()&os.ModeType == 0 {
-				exec = append(exec, fmt.Sprintf("source %s", entrypoint))
-			}
+		stat, err = os.Stat(entrypoint)
+		if err != nil {
+			continue
+		}
+		if stat.Mode()&os.ModeType == 0 {
+			exec = append(exec, fmt.Sprintf("source %s", entrypoint))
 		}
 	}
 
@@ -63,4 +65,8 @@ func (p Dir) CheckUpdate() (*string, error) {
 
 func (p Dir) InstallUpdate() error {
 	return NotUpgradable
+}
+
+func (p Dir) IsInstalled() (installed bool, err error) {
+	return false, NotInstallable
 }

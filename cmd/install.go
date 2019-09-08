@@ -10,14 +10,14 @@ var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install new plugins",
 	Run: func(cmd *cobra.Command, args []string) {
-		var pluginsList []string
-
-		names, plugins, err := MakePluginsFromSpecs(appConfig.Root, pluginsList)
+		ps, err := makePluginStorage(appConfig.Root, appConfig.Plugins)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
+			return
 		}
 
-		checkAndInstallUpdates(names, plugins, false, true, false)
+		ps.checkPluginInstalls()
+		ps.installAll()
 	},
 }
 

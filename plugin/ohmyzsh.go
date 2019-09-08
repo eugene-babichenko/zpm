@@ -79,3 +79,7 @@ func (p *OhMyZsh) LoadTheme(name string) Dir {
 	path := filepath.Join(p.git.Dir.Path, "themes", name)
 	return Dir{Path: path}
 }
+
+func (p *OhMyZsh) IsInstalled() (installed bool, err error) {
+	return p.git.IsInstalled()
+}

@@ -16,6 +16,8 @@ import (
 )
 
 var (
+	Version string
+
 	appConfigFile string
 	appConfig     config.Config
 
@@ -74,6 +76,10 @@ func initConfig() {
 	}
 
 	log.SetLevel(level)
+}
+
+func metaPath() string {
+	return filepath.Join(appConfig.Root, "meta.json")
 }
 
 func getLoggingLevel(levelString string) (log.Level, error) {
