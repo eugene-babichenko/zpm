@@ -4,19 +4,28 @@ import (
 	"github.com/eugene-babichenko/zpm/log"
 
 	"fmt"
+	"os/exec"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
+
+func runUpdateCheck() error {
+	if err := exec.Command("zpm", "check").Start(); err != nil {
+		return errors.Wrap(err, "while running background update check")
+	}
+
+	return nil
+}
 
 var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
-		// updateCheck, _ := cmd.Flags().GetBool("update-check")
+		updateCheck, _ := cmd.Flags().GetBool("update-check")
 		installMissing, _ := cmd.Flags().GetBool("install-missing")
 
-		// TODO parallel update check
 		// TODO print out meta data with hints about updates
 
 		fpath := make([]string, 0)
@@ -63,6 +72,12 @@ var loadCmd = &cobra.Command{
 
 		for _, line := range lines {
 			fmt.Println(line)
+		}
+
+		if updateCheck {
+			if err := runUpdateCheck(); err != nil {
+				log.Error("%s", err)
+			}
 		}
 	},
 }
