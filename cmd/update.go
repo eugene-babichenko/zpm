@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +21,7 @@ var updateCmd = &cobra.Command{
 
 		ps, err := makePluginStorage(rootDir, pluginsList)
 		if err != nil {
-			log.Fatal("while reading plugin configurations: %s", err)
+			log.Fatalf("while reading plugin configurations: %s", err)
 			return
 		}
 

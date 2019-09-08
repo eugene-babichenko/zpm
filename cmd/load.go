@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
-
 	"fmt"
 	"os/exec"
 	"strings"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -40,7 +39,7 @@ var loadCmd = &cobra.Command{
 
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
-			log.Fatal("while reading plugin configurations: %s", err)
+			log.Fatalf("while reading plugin configurations: %s", err)
 			return
 		}
 
@@ -52,7 +51,7 @@ var loadCmd = &cobra.Command{
 		for _, pse := range ps.plugins {
 			fpathPlugin, execPlugin, err := pse.plugin.Load()
 			if err != nil {
-				log.Error("while loading plugin %s: %s", pse.name, err)
+				log.Errorf("while loading plugin %s: %s", pse.name, err)
 				continue
 			}
 			fpath = append(fpath, fpathPlugin...)
@@ -76,7 +75,7 @@ var loadCmd = &cobra.Command{
 
 		if updateCheck {
 			if err := runUpdateCheck(); err != nil {
-				log.Error("%s", err)
+				log.Errorf("%s", err)
 			}
 		}
 	},

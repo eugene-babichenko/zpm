@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
-
 	"os"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +12,7 @@ var completionsCmd = &cobra.Command{
 	Short: "Generate zsh command completions",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := RootCmd.GenZshCompletion(os.Stdout); err != nil {
-			log.Fatal("cannot generate completions: %s", err)
+			log.Fatalf("cannot generate completions: %s", err)
 		}
 	},
 }

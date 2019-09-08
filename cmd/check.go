@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
-
 	"github.com/spf13/cobra"
+	log "github.com/sirupsen/logrus"
 )
 
 var checkCmd = &cobra.Command{
@@ -12,7 +11,7 @@ var checkCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
-			log.Fatal("while reading plugin configurations: %s", err)
+			log.Fatalf("while reading plugin configurations: %s", err)
 			return
 		}
 

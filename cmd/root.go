@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
-
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -29,8 +27,7 @@ var (
 
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		log.Fatal("failed to execute the command: %s", err)
-		os.Exit(1)
+		log.Fatalf("failed to execute the command: %s", err)
 	}
 }
 
@@ -55,60 +52,46 @@ func initConfig() {
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal("failed to get system root directory: %s", err)
+		log.Fatalf("failed to get system root directory: %s", err)
 	}
 	rootDir = filepath.Join(home, ".zpm_plugins")
 
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil && !os.IsExist(err) {
-		log.Fatal("while creating the plugin storage directory: %s", err)
+		log.Fatalf("while creating the plugin storage directory: %s", err)
 	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			log.Fatal("failed to read configuration: %s", err)
+			log.Fatalf("failed to read configuration: %s", err)
 		}
 		// write defaults
 		settings := viper.AllSettings()
 		yamlSettings, err := yaml.Marshal(settings)
 		if err != nil {
-			log.Fatal("failed to serialize the default config: %s", err)
+			log.Fatalf("failed to serialize the default config: %s", err)
 		}
 		configFilePath := filepath.Join(home, ".zpm.yaml")
 		if err := ioutil.WriteFile(configFilePath, yamlSettings, os.ModePerm); err != nil {
-			log.Fatal("failed to write the default config to the drive: %s", err)
+			log.Fatalf("failed to write the default config to the drive: %s", err)
 		}
 	}
 
 	pluginsSpecs = viper.GetStringSlice("Plugins")
 
-	level, err := getLoggingLevel(viper.GetString("LoggingLevel"))
+	level, err := log.ParseLevel(viper.GetString("LoggingLevel"))
 	if err != nil {
-		log.Error("failed to set the logging level: %s", err)
-		return
+		log.Errorf("failed to set the logging level: %s", err)
 	}
 
+	formatter := &log.TextFormatter{}
+	formatter.DisableLevelTruncation = true
+	formatter.DisableTimestamp = true
+
+	log.SetFormatter(formatter)
+	log.SetOutput(os.Stderr)
 	log.SetLevel(level)
 }
 
 func metaPath() string {
 	return filepath.Join(rootDir, "meta.json")
-}
-
-func getLoggingLevel(levelString string) (log.Level, error) {
-	var level log.Level
-	switch levelString {
-	case "debug":
-		level = log.DebugLevel
-	case "info":
-		level = log.InfoLevel
-	case "error":
-		level = log.ErrorLevel
-	case "fatal":
-		level = log.FatalLevel
-	case "":
-		level = log.InfoLevel
-	default:
-		return level, errors.New("invalid logging level specification")
-	}
-	return level, nil
 }

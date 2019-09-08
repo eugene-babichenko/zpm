@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/log"
 	"github.com/eugene-babichenko/zpm/plugin"
 
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type pluginState int32
@@ -97,24 +97,24 @@ func (ps *pluginStorage) checkPluginUpdates() {
 			update, err := pse.plugin.CheckUpdate()
 
 			if plugin.IsNotInstalled(err) {
-				log.Info("not installed: %s", pse.name)
+				log.Infof("not installed: %s", pse.name)
 				ps.plugins[i].state = pluginNeedInstall
 			} else if err != plugin.NotInstallable {
-				log.Debug("plugin %s is not installable", pse.name)
+				log.Debugf("plugin %s is not installable", pse.name)
 			} else if plugin.IsNotUpgradable(err) {
-				log.Debug("plugin %s is not upgradable", pse.name)
+				log.Debugf("plugin %s is not upgradable", pse.name)
 				ps.plugins[i].state = pluginInstalled
 			} else if plugin.IsUpToDate(err) {
-				log.Debug("up to date: %s", pse.name)
+				log.Debugf("up to date: %s", pse.name)
 				ps.plugins[i].state = pluginInstalled
 			} else if err != nil {
-				log.Error("while checking for %s: %s", pse.name, err)
+				log.Errorf("while checking for %s: %s", pse.name, err)
 				ps.plugins[i].state = pluginCheckError
 				errorState := errors.Wrap(err, fmt.Sprintf("while checking for %s", pse.name))
 				ps.plugins[i].errorState = &errorState
 			} else if update != nil {
 				updateLine := fmt.Sprintf("update available for %s: %s", pse.name, *update)
-				log.Info(updateLine)
+				log.Infof(updateLine)
 				ps.plugins[i].state = pluginNeedUpdate
 				ps.plugins[i].updateState = &updateLine
 			}
@@ -131,12 +131,12 @@ func (ps *pluginStorage) checkPluginInstalls() {
 	for i, pse := range ps.plugins {
 		isInstalled, err := pse.plugin.IsInstalled()
 		if err != nil && err != plugin.NotInstalled && err != plugin.NotInstallable {
-			log.Error("while checking for %s: %s", pse.name, err)
+			log.Errorf("while checking for %s: %s", pse.name, err)
 			ps.plugins[i].state = pluginCheckError
 			ps.plugins[i].errorState = &err
 			ps.plugins[i].updateState = nil
 		} else if !isInstalled && err != plugin.NotInstallable {
-			log.Info("not installed: %s", pse.name)
+			log.Infof("not installed: %s", pse.name)
 			ps.plugins[i].state = pluginNeedInstall
 			ps.plugins[i].errorState = nil
 			ps.plugins[i].updateState = nil
@@ -157,14 +157,14 @@ func (ps *pluginStorage) updateAll() {
 			}
 
 			if err := pse.plugin.InstallUpdate(); err != nil {
-				log.Error("while updating %s: %s", pse.name, err)
+				log.Errorf("while updating %s: %s", pse.name, err)
 				ps.plugins[i].state = pluginCheckError
 				errorState := errors.Wrap(err, "while updating %s")
 				ps.plugins[i].errorState = &errorState
 				return
 			}
 
-			log.Info("installed update for %s: %s", pse.name, *pse.updateState)
+			log.Infof("installed update for %s: %s", pse.name, *pse.updateState)
 			ps.plugins[i].state = pluginInstalled
 			ps.plugins[i].updateState = nil
 		}(i, pse)
@@ -183,19 +183,19 @@ func (ps *pluginStorage) installAll() {
 			defer waitGroup.Done()
 
 			if pse.state != pluginNeedInstall {
-				log.Debug("this plugin is not required to be installed: %s", pse.name)
+				log.Debugf("this plugin is not required to be installed: %s", pse.name)
 				return
 			}
 
 			if err := pse.plugin.InstallUpdate(); err != nil {
-				log.Error("while installing %s: %s", pse.name, err)
+				log.Errorf("while installing %s: %s", pse.name, err)
 				ps.plugins[i].state = pluginCheckError
 				errorState := errors.Wrap(err, "while installing %s")
 				ps.plugins[i].errorState = &errorState
 				return
 			}
 
-			log.Info("installed %s", pse.name)
+			log.Infof("installed %s", pse.name)
 			ps.plugins[i].state = pluginInstalled
 		}(i, pse)
 	}
