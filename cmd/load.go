@@ -14,11 +14,10 @@ var loadCmd = &cobra.Command{
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
 		// updateCheck, _ := cmd.Flags().GetBool("update-check")
-		// installMissing, _ := cmd.Flags().GetBool("install-missing")
+		installMissing, _ := cmd.Flags().GetBool("install-missing")
 
 		// TODO parallel update check
 		// TODO print out meta data with hints about updates
-		// TODO install missing plugins when the flag is enabled
 
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
@@ -34,6 +33,11 @@ var loadCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
 			return
+		}
+
+		if installMissing {
+			ps.checkPluginInstalls()
+			ps.installAll()
 		}
 
 		for _, pse := range ps.plugins {
