@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -38,7 +37,7 @@ func init() {
 		&appConfigFile,
 		"config",
 		"",
-		fmt.Sprintf("Config file location (default: $HOME/.zpm.yaml)"),
+		"Config file location (default: $HOME/.zpm.yaml)",
 	)
 }
 

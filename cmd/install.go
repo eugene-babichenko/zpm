@@ -12,7 +12,6 @@ var installCmd = &cobra.Command{
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
-			return
 		}
 
 		ps.checkPluginInstalls()

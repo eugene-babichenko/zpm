@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var checkCmd = &cobra.Command{
@@ -12,7 +12,6 @@ var checkCmd = &cobra.Command{
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
-			return
 		}
 
 		ps.checkPluginUpdates()

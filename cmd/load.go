@@ -40,7 +40,6 @@ var loadCmd = &cobra.Command{
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
-			return
 		}
 
 		if installMissing {
@@ -73,10 +72,11 @@ var loadCmd = &cobra.Command{
 			fmt.Println(line)
 		}
 
-		if updateCheck {
-			if err := runUpdateCheck(); err != nil {
-				log.Errorf("%s", err)
-			}
+		if !updateCheck {
+			return
+		}
+		if err := runUpdateCheck(); err != nil {
+			log.Errorf("%s", err)
 		}
 	},
 }

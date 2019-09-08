@@ -22,7 +22,6 @@ var updateCmd = &cobra.Command{
 		ps, err := makePluginStorage(rootDir, pluginsList)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
-			return
 		}
 
 		ps.checkPluginUpdates()

@@ -45,57 +45,59 @@ type Factory struct {
 func (f *Factory) MakePlugin(spec string) (*Plugin, bool, error) {
 	for _, loader := range loaders {
 		matches := loader.Regex.FindStringSubmatch(spec)
-		if len(matches) > 0 {
-			matchesDict := make(map[string]string)
-			for idx, match := range matches {
-				matchesDict[loader.Regex.SubexpNames()[idx]] = match
-			}
-			plugin, err := loader.Loader(f.Root, matchesDict)
-			if err != nil {
-				return nil, false, errors.Wrap(err, "while loading a plugin")
-			}
-			return plugin, false, nil
+		if len(matches) == 0 {
+			continue
 		}
-	}
-
-	matches := ohMyZshRegex.FindStringSubmatch(spec)
-	if len(matches) > 0 {
-		if f.ohMyZsh == nil {
-			matchesDict := make(map[string]string)
-			for idx, match := range matches {
-				matchesDict[ohMyZshRegex.SubexpNames()[idx]] = match
-			}
-			ohMyZsh := MakeOhMyZsh(f.Root, matchesDict)
-			plugin := Plugin(f.ohMyZsh)
-			f.ohMyZshSpec = spec
-			f.ohMyZsh = &ohMyZsh
-			return &plugin, true, nil
+		matchesDict := make(map[string]string)
+		for idx, match := range matches {
+			matchesDict[loader.Regex.SubexpNames()[idx]] = match
 		}
-		plugin := Plugin(f.ohMyZsh)
-		return &plugin, true, nil
+		plugin, err := loader.Loader(f.Root, matchesDict)
+		if err != nil {
+			return nil, false, errors.Wrap(err, "while loading a plugin")
+		}
+		return plugin, false, nil
 	}
 
 	for _, loader := range ohMyZshLoaders {
 		matches := loader.Regex.FindStringSubmatch(spec)
-		if len(matches) > 0 {
-			matchesDict := make(map[string]string)
-			for idx, match := range matches {
-				matchesDict[loader.Regex.SubexpNames()[idx]] = match
-			}
-			if f.ohMyZsh == nil {
-				ohMyZsh := MakeOhMyZsh(f.Root, make(map[string]string))
-				f.ohMyZshSpec = "oh-my-zsh"
-				f.ohMyZsh = &ohMyZsh
-			}
-			plugin, err := loader.Loader(*f.ohMyZsh, matchesDict)
-			if err != nil {
-				return nil, false, errors.Wrap(err, "while loading a plugin")
-			}
-			return plugin, false, nil
+		if len(matches) == 0 {
+			continue
 		}
+		matchesDict := make(map[string]string)
+		for idx, match := range matches {
+			matchesDict[loader.Regex.SubexpNames()[idx]] = match
+		}
+		if f.ohMyZsh == nil {
+			ohMyZsh := MakeOhMyZsh(f.Root, make(map[string]string))
+			f.ohMyZshSpec = "oh-my-zsh"
+			f.ohMyZsh = &ohMyZsh
+		}
+		plugin, err := loader.Loader(*f.ohMyZsh, matchesDict)
+		if err != nil {
+			return nil, false, errors.Wrap(err, "while loading a plugin")
+		}
+		return plugin, false, nil
 	}
 
-	return nil, false, ErrUnknownPluginType
+	matches := ohMyZshRegex.FindStringSubmatch(spec)
+	if len(matches) == 0 {
+		return nil, false, ErrUnknownPluginType
+	}
+
+	if f.ohMyZsh != nil {
+		plugin := Plugin(f.ohMyZsh)
+		return &plugin, true, nil
+	}
+	matchesDict := make(map[string]string)
+	for idx, match := range matches {
+		matchesDict[ohMyZshRegex.SubexpNames()[idx]] = match
+	}
+	ohMyZsh := MakeOhMyZsh(f.Root, matchesDict)
+	plugin := Plugin(f.ohMyZsh)
+	f.ohMyZshSpec = spec
+	f.ohMyZsh = &ohMyZsh
+	return &plugin, true, nil
 }
 
 func (f *Factory) Dependencies() ([]Plugin, []string) {

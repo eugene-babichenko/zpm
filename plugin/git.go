@@ -67,13 +67,14 @@ func (p *Git) CheckUpdate() (message *string, err error) {
 	newVersionRemote := plumbing.NewRemoteReferenceName("origin", p.requiredRevision)
 	newVersion, err := p.repository.ResolveRevision(plumbing.Revision(newVersionRemote))
 	if err != nil {
+		// then we check local branches
 		newVersion, err = p.repository.ResolveRevision(plumbing.Revision(p.requiredRevision))
-		if err != nil {
-			newVersionLocal := plumbing.NewHash(p.requiredRevision)
-			newVersion = &newVersionLocal
-			if o, _ := p.repository.CommitObject(newVersionLocal); o == nil {
-				return nil, errors.New("failed to get the revision")
-			}
+	}
+	if err != nil {
+		// then we check a commit hash
+		newVersionHash := plumbing.NewHash(p.requiredRevision)
+		newVersion = &newVersionHash
+		if _, err := p.repository.CommitObject(newVersionHash); err != nil {
 			return nil, errors.New("failed to get the revision")
 		}
 	}
