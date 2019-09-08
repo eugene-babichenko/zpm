@@ -17,10 +17,10 @@ var updateCmd = &cobra.Command{
 		if pluginToCheck != "" {
 			pluginsList = []string{pluginToCheck}
 		} else {
-			pluginsList = appConfig.Plugins
+			pluginsList = pluginsSpecs
 		}
 
-		ps, err := makePluginStorage(appConfig.Root, pluginsList)
+		ps, err := makePluginStorage(rootDir, pluginsList)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
 			return

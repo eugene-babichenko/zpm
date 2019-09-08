@@ -30,7 +30,7 @@ var loadCmd = &cobra.Command{
 			"autoload -U compaudit compinit",
 		}
 
-		ps, err := makePluginStorage(appConfig.Root, appConfig.Plugins)
+		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatal("while reading plugin configurations: %s", err)
 			return
@@ -39,7 +39,7 @@ var loadCmd = &cobra.Command{
 		for _, pse := range ps.plugins {
 			fpathPlugin, execPlugin, err := pse.plugin.Load()
 			if err != nil {
-				log.Error("while loading plugin: %s", err)
+				log.Error("while loading plugin %s: %s", pse.name, err)
 				continue
 			}
 			fpath = append(fpath, fpathPlugin...)

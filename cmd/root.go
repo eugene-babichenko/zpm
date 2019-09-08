@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"github.com/eugene-babichenko/zpm/config"
 	"github.com/eugene-babichenko/zpm/log"
 
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,6 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 )
 
@@ -19,7 +18,8 @@ var (
 	Version string
 
 	appConfigFile string
-	appConfig     config.Config
+	rootDir       string
+	pluginsSpecs  []string
 
 	RootCmd = &cobra.Command{
 		Use:   "zpm [command]",
@@ -46,30 +46,42 @@ func init() {
 }
 
 func initConfig() {
+	viper.SetConfigName(".zpm")
+	viper.AddConfigPath("$HOME")
+
+	viper.SetDefault("Plugins", []string{})
+	viper.SetDefault("UpdateCheckPeriod", "24h")
+	viper.SetDefault("LoggingLevel", "info")
+
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal("cannot access the home directory: %s", err)
+		log.Fatal("failed to get system root directory: %s", err)
+	}
+	rootDir = filepath.Join(home, ".zpm_plugins")
+
+	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil && !os.IsExist(err) {
+		log.Fatal("while creating the plugin storage directory: %s", err)
 	}
 
-	if appConfigFile == "" {
-		appConfigFile = filepath.Join(home, ".zpm.yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Fatal("failed to read configuration: %s", err)
+		}
+		// write defaults
+		settings := viper.AllSettings()
+		yamlSettings, err := yaml.Marshal(settings)
+		if err != nil {
+			log.Fatal("failed to serialize the default config: %s", err)
+		}
+		configFilePath := filepath.Join(home, ".zpm.yaml")
+		if err := ioutil.WriteFile(configFilePath, yamlSettings, os.ModePerm); err != nil {
+			log.Fatal("failed to write the default config to the drive: %s", err)
+		}
 	}
 
-	appConfigLocal, err := loadConfigOrCreateDefault(appConfigFile)
-	if err != nil {
-		log.Fatal("failed to read the config: %s", err)
-	}
+	pluginsSpecs = viper.GetStringSlice("Plugins")
 
-	//noinspection GoNilness
-	appConfigLocal.Validate(home)
-	//noinspection GoNilness
-	appConfig = *appConfigLocal
-
-	if err := os.MkdirAll(appConfig.Root, os.ModePerm); err != nil && !os.IsExist(err) {
-		log.Fatal("while creating github plugin object: %s", err)
-	}
-
-	level, err := getLoggingLevel(appConfig.LogLevel)
+	level, err := getLoggingLevel(viper.GetString("LoggingLevel"))
 	if err != nil {
 		log.Error("failed to set the logging level: %s", err)
 		return
@@ -79,7 +91,7 @@ func initConfig() {
 }
 
 func metaPath() string {
-	return filepath.Join(appConfig.Root, "meta.json")
+	return filepath.Join(rootDir, "meta.json")
 }
 
 func getLoggingLevel(levelString string) (log.Level, error) {
@@ -99,42 +111,4 @@ func getLoggingLevel(levelString string) (log.Level, error) {
 		return level, errors.New("invalid logging level specification")
 	}
 	return level, nil
-}
-
-func loadConfigOrCreateDefault(path string) (*config.Config, error) {
-	if configFile, err := ioutil.ReadFile(path); os.IsNotExist(err) {
-		var configData []byte
-		switch filepath.Ext(path) {
-		case ".json":
-			configData, err = json.Marshal(config.DefaultConfig())
-		case ".yaml", ".yml":
-			configData, err = yaml.Marshal(config.DefaultConfig())
-		default:
-			return nil, errors.New("unsupported extension")
-		}
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to build the config file contents")
-		}
-		if err := ioutil.WriteFile(path, configData, os.ModePerm); err != nil {
-			return nil, errors.Wrap(err, "failed to write the config file")
-		}
-		c := config.DefaultConfig()
-		return &c, nil
-	} else if err != nil {
-		return nil, errors.Wrap(err, "failed to read the config file")
-	} else {
-		var configData config.Config
-		switch filepath.Ext(path) {
-		case ".json":
-			err = json.Unmarshal(configFile, &configData)
-		case ".yaml", ".yml":
-			err = yaml.Unmarshal(configFile, &configData)
-		default:
-			return nil, errors.New("unsupported extension")
-		}
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to parse the config file")
-		}
-		return &configData, nil
-	}
 }

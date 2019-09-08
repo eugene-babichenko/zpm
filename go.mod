@@ -3,6 +3,7 @@ module github.com/eugene-babichenko/zpm
 require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443 // indirect
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859 // indirect
