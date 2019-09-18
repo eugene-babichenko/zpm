@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func runUpdateCheck() error {
@@ -22,8 +23,8 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
-		updateCheck, _ := cmd.Flags().GetBool("update-check")
-		installMissing, _ := cmd.Flags().GetBool("install-missing")
+		updateCheck := viper.GetBool("OnLoad.CheckForUpdates")
+		installMissing := viper.GetBool("OnLoad.InstallMissingPlugins")
 
 		// TODO print out meta data with hints about updates
 
@@ -82,17 +83,5 @@ var loadCmd = &cobra.Command{
 }
 
 func init() {
-	loadCmd.Flags().Bool(
-		"update-check",
-		false,
-		"Check for updates once in a period defined in the settings (default: 24h).",
-	)
-
-	loadCmd.Flags().Bool(
-		"install-missing",
-		false,
-		"Install plugins that are listed in the configuration but are not installed.",
-	)
-
 	RootCmd.AddCommand(loadCmd)
 }

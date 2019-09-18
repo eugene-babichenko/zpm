@@ -1,6 +1,6 @@
 # zpm - simple and fast zsh plugins manager
 
-<center>
+<div style="text-align: center;">
 
 [![Latest Release](https://img.shields.io/github/release/eugene-babichenko/zpm.svg?style=flat-square)](https://github.com/eugene-babichenko/zpm/releases/latest)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://img.shields.io/badge/license-MIT-brightgreen.svg)
@@ -9,7 +9,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/eugene-babichenko/zpm)](https://goreportcard.com/report/github.com/eugene-babichenko/zpm)
 [![Powered by: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=flat-square)](https://github.com/goreleaser)
 
-</center>
+</div>
 
 `zpm` is a plugin manager for [`zsh`][zsh] designed to be fast and easy to
 configure.
@@ -56,12 +56,8 @@ installation (`$GOPATH/bin`) into the `PATH` variable and after you load any
 completions into the shell.
 
 ```bash
-# Load plugins into the shell. Remove `--install-missing` if you do not want to
-# install new plugins automatically after they were added to the configuration
-# file. Remove `--update-check` if you do not want to check for updates
-# automatically. Note that the check is performed only once per the period
-# specified in the config file (default: once per day).
-source <(zpm load --update-check --install-missing)
+# Load plugins into the shell
+source <(zpm load)
 ```
 
 ### Configuring plugins
@@ -74,10 +70,10 @@ Here is an example configuration:
 
 ```yaml
 Plugins:
-- github.com/zsh-users/zsh-autosuggestions
-- github.com/mafredri/zsh-async
-- github.com/sindresorhus/pure
-- oh-my-zsh/plugin/colored-man-pages
+  - github.com/zsh-users/zsh-autosuggestions
+  - github.com/mafredri/zsh-async
+  - github.com/sindresorhus/pure
+  - oh-my-zsh/plugin/colored-man-pages
 ```
 
 You can specify a plugin version if required. Branch names, tags and commit
@@ -87,8 +83,8 @@ for `"oh-my-zsh"` plugin line (not for `"oh-my-zsh/plugin/*"` and
 
 ```yaml
 Plugins:
-- github.com/marzocchi/zsh-notify@v1.0
-- oh-my-zsh@ea3e666e04bfae31b37ef42dfe54801484341e46
+  - github.com/marzocchi/zsh-notify@v1.0
+  - oh-my-zsh@ea3e666e04bfae31b37ef42dfe54801484341e46
 ```
 
 JSON is also possible:
@@ -125,11 +121,18 @@ This section contains the list of available configuration keys.
 
 - `Plugins` (`[string]`) - the list of plugin specifications. The format for
   specifications is described in [Configuring plugins](#configuring-plugins).
-- `UpdateCheckPeriod` (`string`) the period to check for updates. Used when
-  `zpm check` is called with `--periodic`. Valid examples are `3h`, `30m`,
-  `5h30m20s`. The default value `24h`.
 - `LogLevel` (`string`) - logging level. Valid values are `debug`, `info`,
   `error` and `fatal`. The default value is `info`.
+- `OnLoad.CheckForUpdates` (`bool`) - whether to check for updates a new shell
+  loads. This is done in the background and does not hit the performance. The
+  default value is `true`
+- `OnLoad.UpdateCheckPeriod` (`string`) defines the minimal period between the
+  updates checks that are run when a new shell loads (valid when
+  `OnLoad.CheckForUpdates` is set to `true`).Valid examples are `3h`, `30m`,
+  `5h30m20s`. The default value `24h`.
+- `OnLoad.InstallMissingPlugins` (`bool`) - whether to install plugins, that are
+  specified in the config byt are not installed, when a new shell loads. The
+  default value is `true`.
 
 ## Available commands
 

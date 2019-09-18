@@ -46,8 +46,10 @@ func initConfig() {
 	viper.AddConfigPath("$HOME")
 
 	viper.SetDefault("Plugins", []string{})
-	viper.SetDefault("UpdateCheckPeriod", "24h")
 	viper.SetDefault("LoggingLevel", "info")
+	viper.SetDefault("OnLoad.InstallMissingPlugins", true)
+	viper.SetDefault("OnLoad.CheckForUpdates", true)
+	viper.SetDefault("OnLoad.UpdateCheckPeriod", "24h")
 
 	home, err := os.UserHomeDir()
 	if err != nil {
