@@ -41,7 +41,27 @@ func init() {
 	)
 }
 
+type prefixedWriter struct{}
+
+func (prefixedWriter) Write(p []byte) (n int, err error) {
+	nPrefix, err := os.Stderr.Write([]byte("zpm: "))
+	if err != nil {
+		return nPrefix, err
+	}
+	np, err := os.Stderr.Write(p)
+	return nPrefix + np, err
+}
+
 func initConfig() {
+	formatter := &log.TextFormatter{}
+	formatter.DisableLevelTruncation = true
+	formatter.DisableTimestamp = true
+	// this is required to have colored output with a custom writer
+	formatter.ForceColors = true
+
+	log.SetFormatter(formatter)
+	log.SetOutput(prefixedWriter{})
+
 	viper.SetConfigName(".zpm")
 	viper.AddConfigPath("$HOME")
 
@@ -84,12 +104,6 @@ func initConfig() {
 		log.Errorf("failed to set the logging level: %s", err)
 	}
 
-	formatter := &log.TextFormatter{}
-	formatter.DisableLevelTruncation = true
-	formatter.DisableTimestamp = true
-
-	log.SetFormatter(formatter)
-	log.SetOutput(os.Stderr)
 	log.SetLevel(level)
 }
 
