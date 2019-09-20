@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"time"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +21,10 @@ var updateCmd = &cobra.Command{
 		if pluginToUpdate == "" {
 			ps.checkPluginUpdates(false)
 			ps.updateAll()
+			if err := setLastUpdateTime(time.Now()); err != nil {
+				log.Errorf("failed to write last update time: %s", err)
+				log.Error("note that this will result in extra update checks on zsh load")
+			}
 			return
 		}
 

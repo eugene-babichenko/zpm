@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -87,6 +88,16 @@ var loadCmd = &cobra.Command{
 		}
 
 		if !updateCheck {
+			return
+		}
+		t, err := getLastUpdateTime()
+		if err != nil {
+			log.Errorf("failed to read last update time: %s", err)
+			log.Error("note that this will result in extra update checks on zsh load")
+		}
+		checkAfter := t.Add(updateCheckPeriod)
+		if t.Before(checkAfter) {
+			log.Debug("update check should be performed after %s", checkAfter.Format(time.RFC1123))
 			return
 		}
 		if err := runUpdateCheck(); err != nil {

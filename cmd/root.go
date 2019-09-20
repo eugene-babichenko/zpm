@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -14,9 +15,10 @@ import (
 var (
 	Version string
 
-	appConfigFile string
-	rootDir       string
-	pluginsSpecs  []string
+	appConfigFile     string
+	rootDir           string
+	pluginsSpecs      []string
+	updateCheckPeriod time.Duration
 
 	RootCmd = &cobra.Command{
 		Use:   "zpm [command]",
@@ -105,8 +107,9 @@ func initConfig() {
 	}
 
 	log.SetLevel(level)
-}
 
-func metaPath() string {
-	return filepath.Join(rootDir, "meta.json")
+	updateCheckPeriod, err = time.ParseDuration(viper.GetString("OnLoad.UpdateCheckPeriod"))
+	if err != nil {
+		log.Fatalf("failed to parse OnLoad.UpdateCheckPeriod")
+	}
 }
