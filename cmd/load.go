@@ -26,8 +26,6 @@ var loadCmd = &cobra.Command{
 		updateCheck := viper.GetBool("OnLoad.CheckForUpdates")
 		installMissing := viper.GetBool("OnLoad.InstallMissingPlugins")
 
-		// TODO print out meta data with hints about updates
-
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
 
@@ -43,12 +41,27 @@ var loadCmd = &cobra.Command{
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
+		ps.checkPluginInstalls()
+		// check if there are downloaded updates
+		ps.checkPluginUpdates(true)
+
 		if installMissing {
-			ps.checkPluginInstalls()
 			ps.installAll()
 		}
 
 		for _, pse := range ps.plugins {
+			switch pse.state {
+			case pluginNeedInstall:
+				log.Infof("plugin is not installed: %s", pse.name)
+			case pluginNeedUpdate:
+				log.Info(pse.updateState)
+			case pluginCheckError:
+				log.Error(pse.errorState)
+			}
+		}
+
+		for _, name := range ps.loadOrder {
+			pse := ps.plugins[name]
 			fpathPlugin, execPlugin, err := pse.plugin.Load()
 			if err != nil {
 				log.Errorf("while loading plugin %s: %s", pse.name, err)

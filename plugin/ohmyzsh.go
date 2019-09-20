@@ -62,8 +62,8 @@ func (p *OhMyZsh) Load() (fpath []string, exec []string, err error) {
 	return fpath, exec, nil
 }
 
-func (p *OhMyZsh) CheckUpdate() (*string, error) {
-	return p.git.CheckUpdate()
+func (p *OhMyZsh) CheckUpdate(offline bool) (*string, error) {
+	return p.git.CheckUpdate(offline)
 }
 
 func (p *OhMyZsh) InstallUpdate() error {

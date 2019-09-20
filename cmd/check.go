@@ -14,7 +14,7 @@ var checkCmd = &cobra.Command{
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
-		ps.checkPluginUpdates()
+		ps.checkPluginUpdates(false)
 	},
 }
 

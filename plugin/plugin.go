@@ -44,7 +44,7 @@ type Plugin interface {
 	// update is available, `nil` is returned instead of an update description.
 	// If a plugin is not installed, an error must be set to `NotInstalled` and
 	// this can be checked with the `IsNotInstalled` function.
-	CheckUpdate() (message *string, err error)
+	CheckUpdate(offline bool) (message *string, err error)
 	// Install an update if available or install a plugin if not installed. Must
 	// be called after a successful `CheckUpdate` call (that returned an update
 	// description or the `NotInstalled` error). Otherwise it may cause a panic

@@ -59,7 +59,7 @@ func (p Dir) Load() (fpath []string, exec []string, err error) {
 	return fpath, exec, nil
 }
 
-func (p Dir) CheckUpdate() (*string, error) {
+func (p Dir) CheckUpdate(bool) (*string, error) {
 	return nil, NotUpgradable
 }
 

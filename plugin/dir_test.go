@@ -114,7 +114,7 @@ func TestDirLoadNotADirectory(t *testing.T) {
 func TestDirUpdate(t *testing.T) {
 	plugin := Dir{}
 
-	_, err := plugin.CheckUpdate()
+	_, err := plugin.CheckUpdate(false)
 	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
 
 	err = plugin.InstallUpdate()

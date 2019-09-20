@@ -37,7 +37,7 @@ func (p *Git) Load() ([]string, []string, error) {
 	return p.Dir.Load()
 }
 
-func (p *Git) CheckUpdate() (message *string, err error) {
+func (p *Git) CheckUpdate(offline bool) (message *string, err error) {
 	p.repository, err = git.PlainOpen(p.Dir.Path)
 	if err == git.ErrRepositoryNotExists {
 		return nil, NotInstalled
@@ -55,12 +55,14 @@ func (p *Git) CheckUpdate() (message *string, err error) {
 
 	currentVersion := currentHead.Hash()
 
-	fetchOptions := git.FetchOptions{}
-	if err := fetchOptions.Validate(); err != nil {
-		return nil, errors.Wrap(err, "while fetching the repository")
-	}
-	if err := p.repository.Fetch(&fetchOptions); err != nil && err != git.NoErrAlreadyUpToDate {
-		return nil, errors.Wrap(err, "while fetching the repository")
+	if !offline {
+		fetchOptions := git.FetchOptions{}
+		if err := fetchOptions.Validate(); err != nil {
+			return nil, errors.Wrap(err, "while fetching the repository")
+		}
+		if err := p.repository.Fetch(&fetchOptions); err != nil && err != git.NoErrAlreadyUpToDate {
+			return nil, errors.Wrap(err, "while fetching the repository")
+		}
 	}
 
 	// because we fetch, not pull, we need to check the remote branches

@@ -9,23 +9,25 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Install updates",
 	Run: func(cmd *cobra.Command, args []string) {
-		pluginToCheck, _ := cmd.Flags().GetString("plugin")
+		pluginToUpdate, _ := cmd.Flags().GetString("plugin")
 
-		var pluginsList []string
-		// Update a single plugin if required.
-		if pluginToCheck != "" {
-			pluginsList = []string{pluginToCheck}
-		} else {
-			pluginsList = pluginsSpecs
-		}
-
-		ps, err := makePluginStorage(rootDir, pluginsList)
+		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
-		ps.checkPluginUpdates()
-		ps.updateAll()
+		if pluginToUpdate == "" {
+			ps.checkPluginUpdates(false)
+			ps.updateAll()
+			return
+		}
+
+		pse, ok := ps.plugins[pluginToUpdate]
+		if !ok {
+			log.Fatalf("plugin %s not listed in the configuration file", pluginToUpdate)
+		}
+		pse.checkPluginUpdate(false)
+		pse.update()
 	},
 }
 
