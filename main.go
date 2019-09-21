@@ -1,11 +1,11 @@
 package main
 
-import "github.com/eugene-babichenko/zpm/cmd"
+import "github.com/eugene-babichenko/zpm/commands"
 
 // to be filled in during the build process
 var version = "dev"
 
 func main() {
-	cmd.Version = version
-	cmd.Execute()
+	commands.Version = version
+	commands.Execute()
 }

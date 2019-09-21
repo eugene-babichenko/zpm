@@ -1,4 +1,4 @@
-package cmd
+package commands
 
 import (
 	"github.com/eugene-babichenko/zpm/plugin"
@@ -7,23 +7,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var checkCmd = &cobra.Command{
-	Use:   "check",
-	Short: "Check for updates",
+var installCmd = &cobra.Command{
+	Use:   "install",
+	Short: "Install new plugins",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("checking for updates...")
+		log.Info("installing plugins...")
+		log.Info("not updating plugins! Run `zpm update` to do it.")
 
 		ps, err := plugin.MakePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
-		ps.CheckPluginUpdates(false)
+		ps.CheckPluginInstalls()
+		ps.InstallAll()
 
-		log.Info("update check finished")
+		log.Info("installation finished!")
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(checkCmd)
+	RootCmd.AddCommand(installCmd)
 }
