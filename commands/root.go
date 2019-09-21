@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/eugene-babichenko/zpm/assets"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,7 +10,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -92,13 +92,10 @@ func initConfig() {
 			log.Fatalf("failed to read configuration: %s", err)
 		}
 		// write defaults
-		settings := viper.AllSettings()
-		yamlSettings, err := yaml.Marshal(settings)
-		if err != nil {
-			log.Fatalf("failed to serialize the default config: %s", err)
-		}
 		configFilePath := filepath.Join(home, ".zpm.yaml")
-		if err := ioutil.WriteFile(configFilePath, yamlSettings, os.ModePerm); err != nil {
+		// this is used to preserve uppercase letters which viper does not care about
+		yamlConfig, _ := assets.Asset("config/.zpm.yaml")
+		if err := ioutil.WriteFile(configFilePath, yamlConfig, os.ModePerm); err != nil {
 			log.Fatalf("failed to write the default config to the drive: %s", err)
 		}
 	}

@@ -28,8 +28,6 @@ nfpms:
   - rpm
   recommends:
   - zsh
-  scripts:
-    postinstall: "scripts/postinstall.sh"
 brews:
 - github:
     owner: eugene-babichenko
