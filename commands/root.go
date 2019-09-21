@@ -43,9 +43,13 @@ func init() {
 	)
 }
 
+// prefixedWriter allows to add "zsh: " between log lines
 type prefixedWriter struct{}
 
 func (prefixedWriter) Write(p []byte) (n int, err error) {
+	// Writing logs to stderr is workaround. In `source <(zpm load)` the
+	// `<(...)` consumes only what is written to stdout. Thus, writing logs to
+	// stderr allows us to have nice logs while loading plugins.
 	nPrefix, err := os.Stderr.Write([]byte("zpm: "))
 	if err != nil {
 		return nPrefix, err

@@ -34,6 +34,9 @@ func getLastUpdateTime() (t time.Time, err error) {
 }
 
 func runUpdateCheck() error {
+	// This process is forked and run in background even after `zpm load` is
+	// finished. Such approach makes on load update checks look much faster:
+	// up to 20 ms (forked) vs 1.5-2 secs (synchronous) on my setup.
 	if err := exec.Command("zpm", "check").Start(); err != nil {
 		return errors.Wrap(err, "while running background update check")
 	}
@@ -53,6 +56,7 @@ var loadCmd = &cobra.Command{
 
 		// Use different compdump for different zsh versions (kindly borrowed from Oh My Zsh).
 		fmt.Println("ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"")
+		// initialize zsh completion system
 		fmt.Println("autoload -U compaudit compinit")
 
 		ps, err := plugin.MakePluginStorage(rootDir, pluginsSpecs)
@@ -62,11 +66,11 @@ var loadCmd = &cobra.Command{
 
 		// check if there are downloaded updates
 		ps.CheckPluginUpdates(true)
-
 		if installMissing {
 			ps.InstallAll()
 		}
 
+		// plugin load order must be preserved because of dependencies between them
 		for _, name := range ps.LoadOrder {
 			pse := ps.Plugins[name]
 			fpathPlugin, execPlugin, err := pse.Plugin.Load()
@@ -78,6 +82,8 @@ var loadCmd = &cobra.Command{
 			exec = append(exec, execPlugin...)
 		}
 
+		// build fpath: it contains paths to files with zsh functions
+		// definitions including completions
 		var fpathBuilder strings.Builder
 		_, _ = fmt.Fprint(&fpathBuilder, "fpath=(")
 		for _, fpathEntry := range fpath {

@@ -8,7 +8,7 @@ var NotInstalled = errors.New("not installed")
 
 // Returned by `Plugin.CheckUpdate` and indicates that a plugin being checked
 // is not upgradable.
-var NotUpgradable = errors.New("this plugin is not upgradable")
+var ErrNotUpgradable = errors.New("this plugin is not upgradable")
 
 // Returned by `Plugin.CheckUpdate` and indicates that a plugin being checked
 // is up to date.
@@ -25,7 +25,7 @@ func IsNotInstalled(err error) bool {
 // Check if a plugin is cannot be updated with the error value of
 // `Plugin.CheckUpdate`.
 func IsNotUpgradable(err error) bool {
-	return err == NotUpgradable
+	return err == ErrNotUpgradable
 }
 
 // Check if a plugin is up to date with the error value of

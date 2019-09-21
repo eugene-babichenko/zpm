@@ -115,10 +115,10 @@ func TestDirUpdate(t *testing.T) {
 	plugin := Dir{}
 
 	_, err := plugin.CheckUpdate(false)
-	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
+	assert.Equal(t, ErrNotUpgradable, err, "the dir plugin must not be upgradable")
 
 	err = plugin.InstallUpdate()
-	assert.Equal(t, NotUpgradable, err, "the dir plugin must not be upgradable")
+	assert.Equal(t, ErrNotUpgradable, err, "the dir plugin must not be upgradable")
 }
 
 //  Scenario: Missing path for plugin creation

@@ -45,6 +45,7 @@ func (p *Git) CheckUpdate(offline bool) (message *string, err error) {
 		return nil, errors.Wrap(err, "while opening the repository")
 	}
 
+	// get the current git HEAD
 	currentHead, err := p.repository.Head()
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot read repository HEAD")
@@ -52,7 +53,6 @@ func (p *Git) CheckUpdate(offline bool) (message *string, err error) {
 	if currentHead == nil {
 		return nil, errors.New("cannot read repository HEAD")
 	}
-
 	currentVersion := currentHead.Hash()
 
 	if !offline {

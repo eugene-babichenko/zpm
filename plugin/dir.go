@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// The plugin type loaded from a source directory.
+// Dir is the plugin type loaded from a source directory.
 type Dir struct {
 	Path string
 }
@@ -60,11 +60,11 @@ func (p Dir) Load() (fpath []string, exec []string, err error) {
 }
 
 func (p Dir) CheckUpdate(bool) (*string, error) {
-	return nil, NotUpgradable
+	return nil, ErrNotUpgradable
 }
 
 func (p Dir) InstallUpdate() error {
-	return NotUpgradable
+	return ErrNotUpgradable
 }
 
 func (p Dir) IsInstalled() (installed bool, err error) {
