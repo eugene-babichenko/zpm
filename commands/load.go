@@ -51,12 +51,9 @@ var loadCmd = &cobra.Command{
 		fpath := make([]string, 0)
 		exec := make([]string, 0)
 
-		lines := []string{
-			// Use different compdump for different zsh versions (kindly
-			// borrowed from Oh My Zsh).
-			"ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"",
-			"autoload -U compaudit compinit",
-		}
+		// Use different compdump for different zsh versions (kindly borrowed from Oh My Zsh).
+		fmt.Println("ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"")
+		fmt.Println("autoload -U compaudit compinit")
 
 		ps, err := plugin.MakePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
@@ -89,11 +86,10 @@ var loadCmd = &cobra.Command{
 		_, _ = fmt.Fprint(&fpathBuilder, "$fpath)")
 
 		// Load completions from `fpath`.
-		lines = append(lines, fpathBuilder.String(), "compinit -u -C -d \"${ZSH_COMPDUMP}\"")
-		lines = append(lines, exec...)
-
-		for _, line := range lines {
-			fmt.Println(line)
+		fmt.Println(fpathBuilder.String())
+		fmt.Println("compinit -u -C -d \"${ZSH_COMPDUMP}\"")
+		for _, execLine := range exec {
+			fmt.Println(execLine)
 		}
 
 		if !updateCheck {
