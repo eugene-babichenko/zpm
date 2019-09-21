@@ -111,7 +111,7 @@ func (pse *pluginStorageEntry) Update() {
 	}
 
 	if pse.updateInternal() {
-		log.Infof("installed update for %s: %s", pse.Name, *pse.updateState)
+		log.Infof("installed update for %s", pse.Name)
 		pse.state = pluginInstalled
 		pse.updateState = nil
 	}
