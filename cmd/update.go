@@ -13,6 +13,9 @@ var updateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		pluginToUpdate, _ := cmd.Flags().GetString("plugin")
 
+		log.Info("updating installed plugins...")
+		log.Info("not installing new plugins! Run `zpm install` to do it.")
+
 		ps, err := makePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
@@ -25,6 +28,7 @@ var updateCmd = &cobra.Command{
 				log.Errorf("failed to write last update time: %s", err)
 				log.Error("note that this will result in extra update checks on zsh load")
 			}
+			log.Info("update finished")
 			return
 		}
 
@@ -34,6 +38,8 @@ var updateCmd = &cobra.Command{
 		}
 		pse.checkPluginUpdate(false)
 		pse.update()
+
+		log.Info("update finished")
 	},
 }
 

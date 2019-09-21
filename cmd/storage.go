@@ -152,7 +152,7 @@ func (pse *pluginStorageEntry) checkPluginUpdate(offline bool) {
 	if plugin.IsNotInstalled(err) {
 		log.Infof("not installed: %s", pse.name)
 		pse.state = pluginNeedInstall
-	} else if err != plugin.NotInstallable {
+	} else if err == plugin.NotInstallable {
 		log.Debugf("plugin %s is not installable", pse.name)
 	} else if plugin.IsNotUpgradable(err) {
 		log.Debugf("plugin %s is not upgradable", pse.name)

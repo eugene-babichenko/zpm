@@ -42,23 +42,11 @@ var loadCmd = &cobra.Command{
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
-		ps.checkPluginInstalls()
 		// check if there are downloaded updates
 		ps.checkPluginUpdates(true)
 
 		if installMissing {
 			ps.installAll()
-		}
-
-		for _, pse := range ps.plugins {
-			switch pse.state {
-			case pluginNeedInstall:
-				log.Infof("plugin is not installed: %s", pse.name)
-			case pluginNeedUpdate:
-				log.Info(pse.updateState)
-			case pluginCheckError:
-				log.Error(pse.errorState)
-			}
 		}
 
 		for _, name := range ps.loadOrder {
@@ -97,7 +85,7 @@ var loadCmd = &cobra.Command{
 		}
 		checkAfter := t.Add(updateCheckPeriod)
 		if t.Before(checkAfter) {
-			log.Debug("update check should be performed after %s", checkAfter.Format(time.RFC1123))
+			log.Debugf("update check should be performed after %s", checkAfter.Format(time.RFC1123))
 			return
 		}
 		if err := runUpdateCheck(); err != nil {
