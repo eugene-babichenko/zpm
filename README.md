@@ -121,7 +121,7 @@ This section contains the list of available configuration keys.
 
 - `Plugins` (`[string]`) - the list of plugin specifications. The format for
   specifications is described in [Configuring plugins](#configuring-plugins).
-- `LogLevel` (`string`) - logging level. Valid values are `debug`, `info`,
+- `LoggingLevel` (`string`) - logging level. Valid values are `debug`, `info`,
   `error` and `fatal`. The default value is `info`.
 - `OnLoad.CheckForUpdates` (`bool`) - whether to check for updates a new shell
   loads. This is done in the background and does not hit the performance. The
