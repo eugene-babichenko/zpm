@@ -1,8 +1,13 @@
 package cmd
 
 import (
+	"github.com/eugene-babichenko/zpm/plugin"
+
 	"fmt"
+	"io/ioutil"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -11,6 +16,22 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+func getLastUpdateTime() (t time.Time, err error) {
+	filename := filepath.Join(rootDir, ".lastupdate")
+	data, err := ioutil.ReadFile(filename)
+	if os.IsNotExist(err) {
+		return t, nil
+	}
+	if err != nil {
+		return t, errors.Wrap(err, "while reading last update time")
+	}
+	t, err = time.Parse(time.RFC3339, string(data))
+	if err != nil {
+		return t, errors.Wrap(err, "failed to parse time")
+	}
+	return t, nil
+}
 
 func runUpdateCheck() error {
 	if err := exec.Command("zpm", "check").Start(); err != nil {
@@ -37,23 +58,23 @@ var loadCmd = &cobra.Command{
 			"autoload -U compaudit compinit",
 		}
 
-		ps, err := makePluginStorage(rootDir, pluginsSpecs)
+		ps, err := plugin.MakePluginStorage(rootDir, pluginsSpecs)
 		if err != nil {
 			log.Fatalf("while reading plugin configurations: %s", err)
 		}
 
 		// check if there are downloaded updates
-		ps.checkPluginUpdates(true)
+		ps.CheckPluginUpdates(true)
 
 		if installMissing {
-			ps.installAll()
+			ps.InstallAll()
 		}
 
-		for _, name := range ps.loadOrder {
-			pse := ps.plugins[name]
-			fpathPlugin, execPlugin, err := pse.plugin.Load()
+		for _, name := range ps.LoadOrder {
+			pse := ps.Plugins[name]
+			fpathPlugin, execPlugin, err := pse.Plugin.Load()
 			if err != nil {
-				log.Errorf("while loading plugin %s: %s", pse.name, err)
+				log.Errorf("while loading plugin %s: %s", pse.Name, err)
 				continue
 			}
 			fpath = append(fpath, fpathPlugin...)

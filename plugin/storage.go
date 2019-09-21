@@ -1,8 +1,6 @@
-package cmd
+package plugin
 
 import (
-	"github.com/eugene-babichenko/zpm/plugin"
-
 	"fmt"
 	"path/filepath"
 	"sync"
@@ -22,29 +20,29 @@ const (
 )
 
 type pluginStorageEntry struct {
-	name        string
-	plugin      plugin.Plugin
+	Name        string
+	Plugin      Plugin
 	state       pluginState
 	errorState  error
 	updateState *string
 }
 
 type pluginStorage struct {
-	plugins map[string]*pluginStorageEntry
+	Plugins map[string]*pluginStorageEntry
 	// the order in which plugins are loaded is important, so we must preserve it
-	loadOrder []string
+	LoadOrder []string
 }
 
-func makePluginStorage(
+func MakePluginStorage(
 	root string,
 	pluginSpecs []string,
 ) (ps *pluginStorage, err error) {
 	ps = &pluginStorage{
-		plugins: make(map[string]*pluginStorageEntry),
+		Plugins: make(map[string]*pluginStorageEntry),
 	}
 
 	root = filepath.Join(root, "Plugins")
-	factory := &plugin.Factory{Root: root}
+	factory := &Factory{Root: root}
 
 	for _, pluginSpec := range pluginSpecs {
 		p, isDependency, err := factory.MakePlugin(pluginSpec)
@@ -54,8 +52,8 @@ func makePluginStorage(
 		}
 
 		pse := &pluginStorageEntry{
-			name:        pluginSpec,
-			plugin:      *p,
+			Name:        pluginSpec,
+			Plugin:      *p,
 			state:       pluginConfigLoaded,
 			errorState:  nil,
 			updateState: nil,
@@ -64,8 +62,8 @@ func makePluginStorage(
 		// Oh My Zsh is required to be inserted in the beginning of the plugin
 		// load sequence.
 		if !isDependency {
-			ps.plugins[pse.name] = pse
-			ps.loadOrder = append(ps.loadOrder, pse.name)
+			ps.Plugins[pse.Name] = pse
+			ps.LoadOrder = append(ps.LoadOrder, pse.Name)
 		}
 	}
 
@@ -78,27 +76,27 @@ func makePluginStorage(
 
 	for i, p := range factoryDependencies {
 		pse := &pluginStorageEntry{
-			name:       factoryDependenciesSpecs[i],
-			plugin:     p,
+			Name:       factoryDependenciesSpecs[i],
+			Plugin:     p,
 			state:      pluginConfigLoaded,
 			errorState: nil,
 		}
 		dependencies = append(dependencies, pse)
-		ps.plugins[pse.name] = pse
+		ps.Plugins[pse.Name] = pse
 	}
 
 	dependenciesNames := make([]string, len(dependencies))
 	for i, pse := range dependencies {
-		dependenciesNames[i] = pse.name
+		dependenciesNames[i] = pse.Name
 	}
-	ps.loadOrder = append(dependenciesNames, ps.loadOrder...)
+	ps.LoadOrder = append(dependenciesNames, ps.LoadOrder...)
 
 	return ps, nil
 }
 
 func (pse *pluginStorageEntry) updateInternal() bool {
-	if err := pse.plugin.InstallUpdate(); err != nil {
-		log.Errorf("while installing %s: %s", pse.name, err)
+	if err := pse.Plugin.InstallUpdate(); err != nil {
+		log.Errorf("while installing %s: %s", pse.Name, err)
 		pse.state = pluginCheckError
 		errorState := errors.Wrap(err, "while installing %s")
 		pse.errorState = errorState
@@ -107,13 +105,13 @@ func (pse *pluginStorageEntry) updateInternal() bool {
 	return true
 }
 
-func (pse *pluginStorageEntry) update() {
+func (pse *pluginStorageEntry) Update() {
 	if pse.state != pluginNeedUpdate {
 		return
 	}
 
 	if pse.updateInternal() {
-		log.Infof("installed update for %s: %s", pse.name, *pse.updateState)
+		log.Infof("installed update for %s: %s", pse.Name, *pse.updateState)
 		pse.state = pluginInstalled
 		pse.updateState = nil
 	}
@@ -121,52 +119,52 @@ func (pse *pluginStorageEntry) update() {
 
 func (pse *pluginStorageEntry) install() {
 	if pse.state != pluginNeedInstall {
-		log.Debugf("this plugin is not required to be installed: %s", pse.name)
+		log.Debugf("this plugin is not required to be installed: %s", pse.Name)
 		return
 	}
 
 	if pse.updateInternal() {
-		log.Infof("installed %s", pse.name)
+		log.Infof("installed %s", pse.Name)
 		pse.state = pluginInstalled
 	}
 }
 
 func (pse *pluginStorageEntry) checkPluginInstall() {
-	isInstalled, err := pse.plugin.IsInstalled()
-	if err != nil && err != plugin.NotInstalled && err != plugin.NotInstallable {
-		log.Errorf("while checking for %s: %s", pse.name, err)
+	isInstalled, err := pse.Plugin.IsInstalled()
+	if err != nil && err != NotInstalled && err != NotInstallable {
+		log.Errorf("while checking for %s: %s", pse.Name, err)
 		pse.state = pluginCheckError
 		pse.errorState = err
 		pse.updateState = nil
-	} else if !isInstalled && err != plugin.NotInstallable {
-		log.Infof("not installed: %s", pse.name)
+	} else if !isInstalled && err != NotInstallable {
+		log.Infof("not installed: %s", pse.Name)
 		pse.state = pluginNeedInstall
 		pse.errorState = nil
 		pse.updateState = nil
 	}
 }
 
-func (pse *pluginStorageEntry) checkPluginUpdate(offline bool) {
-	update, err := pse.plugin.CheckUpdate(offline)
+func (pse *pluginStorageEntry) CheckPluginUpdate(offline bool) {
+	update, err := pse.Plugin.CheckUpdate(offline)
 
-	if plugin.IsNotInstalled(err) {
-		log.Infof("not installed: %s", pse.name)
+	if IsNotInstalled(err) {
+		log.Infof("not installed: %s", pse.Name)
 		pse.state = pluginNeedInstall
-	} else if err == plugin.NotInstallable {
-		log.Debugf("plugin %s is not installable", pse.name)
-	} else if plugin.IsNotUpgradable(err) {
-		log.Debugf("plugin %s is not upgradable", pse.name)
+	} else if err == NotInstallable {
+		log.Debugf("plugin %s is not installable", pse.Name)
+	} else if IsNotUpgradable(err) {
+		log.Debugf("plugin %s is not upgradable", pse.Name)
 		pse.state = pluginInstalled
-	} else if plugin.IsUpToDate(err) {
-		log.Debugf("up to date: %s", pse.name)
+	} else if IsUpToDate(err) {
+		log.Debugf("up to date: %s", pse.Name)
 		pse.state = pluginInstalled
 	} else if err != nil {
-		log.Errorf("while checking for %s: %s", pse.name, err)
+		log.Errorf("while checking for %s: %s", pse.Name, err)
 		pse.state = pluginCheckError
-		errorState := errors.Wrap(err, fmt.Sprintf("while checking for %s", pse.name))
+		errorState := errors.Wrap(err, fmt.Sprintf("while checking for %s", pse.Name))
 		pse.errorState = errorState
 	} else if update != nil {
-		updateLine := fmt.Sprintf("update available for %s: %s", pse.name, *update)
+		updateLine := fmt.Sprintf("update available for %s: %s", pse.Name, *update)
 		log.Infof(updateLine)
 		pse.state = pluginNeedUpdate
 		pse.updateState = &updateLine
@@ -174,12 +172,12 @@ func (pse *pluginStorageEntry) checkPluginUpdate(offline bool) {
 }
 
 // checkPluginUpdates checks for both updates and plugins that are not installed
-func (ps *pluginStorage) checkPluginUpdates(offline bool) {
+func (ps *pluginStorage) CheckPluginUpdates(offline bool) {
 	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(len(ps.plugins))
-	for i := range ps.plugins {
+	waitGroup.Add(len(ps.Plugins))
+	for i := range ps.Plugins {
 		go func(i string) {
-			ps.plugins[i].checkPluginUpdate(offline)
+			ps.Plugins[i].CheckPluginUpdate(offline)
 			waitGroup.Done()
 		}(i)
 	}
@@ -187,18 +185,18 @@ func (ps *pluginStorage) checkPluginUpdates(offline bool) {
 }
 
 // checkPluginInstalls checks for plugins that are not installed
-func (ps *pluginStorage) checkPluginInstalls() {
-	for i := range ps.plugins {
-		ps.plugins[i].checkPluginInstall()
+func (ps *pluginStorage) CheckPluginInstalls() {
+	for i := range ps.Plugins {
+		ps.Plugins[i].checkPluginInstall()
 	}
 }
 
-func (ps *pluginStorage) updateAll() {
+func (ps *pluginStorage) UpdateAll() {
 	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(len(ps.plugins))
-	for i := range ps.plugins {
+	waitGroup.Add(len(ps.Plugins))
+	for i := range ps.Plugins {
 		go func(i string) {
-			ps.plugins[i].update()
+			ps.Plugins[i].Update()
 			waitGroup.Done()
 		}(i)
 	}
@@ -206,12 +204,12 @@ func (ps *pluginStorage) updateAll() {
 }
 
 // installAll installs all plugins detected by checkPluginInstalls or checkPluginUpdates
-func (ps *pluginStorage) installAll() {
+func (ps *pluginStorage) InstallAll() {
 	waitGroup := sync.WaitGroup{}
-	waitGroup.Add(len(ps.plugins))
-	for i := range ps.plugins {
+	waitGroup.Add(len(ps.Plugins))
+	for i := range ps.Plugins {
 		go func(i string) {
-			ps.plugins[i].install()
+			ps.Plugins[i].install()
 			waitGroup.Done()
 		}(i)
 	}
