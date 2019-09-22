@@ -66,6 +66,15 @@ var loadCmd = &cobra.Command{
 
 		// check if there are downloaded updates
 		ps.CheckPluginUpdates(true)
+		currentVersion, err := ioutil.ReadFile(filepath.Join(rootDir, ".github_version"))
+		if err != nil && !os.IsNotExist(err) {
+			log.Errorf("failed to read .github_version: %s", err)
+		} else if err == nil {
+			if string(currentVersion) != Version {
+				log.Infof("zpm update available: newer version %s, current version %s", currentVersion, Version)
+				log.Infof("to download the update go to %s", updateLink)
+			}
+		}
 		if installMissing {
 			ps.InstallAll()
 		}

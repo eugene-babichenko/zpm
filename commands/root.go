@@ -12,6 +12,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	updateAPILink = "https://api.github.com/repos/eugene-babichenko/zpm/releases/latest"
+	updateLink    = "https://github.com/eugene-babichenko/zpm"
+)
+
 var (
 	Version string
 
