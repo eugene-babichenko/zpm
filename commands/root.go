@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/eugene-babichenko/zpm/assets"
+
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,10 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	updateAPILink = "https://api.github.com/repos/eugene-babichenko/zpm/releases/latest"
-	updateLink    = "https://github.com/eugene-babichenko/zpm"
-)
+const updateLink = "https://github.com/eugene-babichenko/zpm"
 
 var (
 	Version string
