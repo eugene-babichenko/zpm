@@ -2,7 +2,7 @@
 
 <div style="text-align: center;">
 
-[![Latest Release](https://img.shields.io/github/release/eugene-babichenko/zpm.svg?style=flat-square)](https://github.com/eugene-babichenko/zpm/releases/latest)
+[![Latest Release](https://img.shields.io/github/release/eugene-babichenko/zpm.svg?style=flat-square)][latest-release]
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://img.shields.io/badge/license-MIT-brightgreen.svg)
 [![Build Status](https://travis-ci.org/eugene-babichenko/zpm.svg?branch=master)](https://travis-ci.org/eugene-babichenko/zpm)
 [![Codecov](https://img.shields.io/codecov/c/github/eugene-babichenko/zpm/master.svg?style=flat-square)](https://codecov.io/gh/eugene-babichenko/zpm)
@@ -30,8 +30,11 @@ This project is largely influenced by [Antigen][antigen] and
 
 ## Contents
 
+- [Installation](#installation)
+  - [On macOS](#on-macos)
+  - [On Linux](#on-linux)
+  - [From source](#from-source-any-platform)
 - [Getting Started](#getting-started)
-  - [Installation](#installation)
   - [Your `.zshrc`](#your-zshrc)
   - [Configuring plugins](#configuring-plugins)
   - [Installing and updating plugins](#installing-and-updating-plugins)
@@ -39,15 +42,31 @@ This project is largely influenced by [Antigen][antigen] and
 - [Available commands](#available-commands)
 - [Contributing](#contributing)
 
-## Getting Started
+## Installation
 
-### Installation
+### On macOS
+
+On macOS you can use Homebrew: `brew install eugene-babichenko/tap/zpm`
+
+### On Linux
+
+Go to the [Releases][latest-release] section and download a binary or a
+package (`.deb` or `.rpm`).
+
+Packages can be installed with:
+
+- `dpkg -i package-file.deb`
+- `rpm -i package-gile.rpm`
+
+### From source (any platform)
 
 You will need `go` 1.12 to build this project, so please install it and
 configure Go environment variables. You can follow
 [the official guide][go-guide].
 
-Then just run `go get -u github.com/eugene-babichenko/zpm`.
+Then run `go get -u github.com/eugene-babichenko/zpm`.
+
+## Getting Started
 
 ### Your `.zshrc`
 
@@ -155,3 +174,4 @@ commands. Note that this project requires [go-bindata] to build.
 [ohmyzsh]: https://github.com/robbyrussell/oh-my-zsh
 [zsh]: https://sourceforge.net/projects/zsh/
 [go-bindata]: https://github.com/jteeuwen/go-bindata
+[latest-release]: https://github.com/eugene-babichenko/zpm/releases/latest
