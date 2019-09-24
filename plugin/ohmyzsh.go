@@ -12,7 +12,7 @@ type OhMyZsh struct {
 	git Git
 }
 
-func MakeOhMyZsh(root string, params map[string]string) OhMyZsh {
+func MakeOhMyZsh(root string, params map[string]string) (*Plugin, error) {
 	requiredRevision, _ := params["version"]
 	if requiredRevision == "" {
 		requiredRevision = "master"
@@ -21,27 +21,30 @@ func MakeOhMyZsh(root string, params map[string]string) OhMyZsh {
 	URL := filepath.Join("github.com", "robbyrussell", "oh-my-zsh")
 	git := NewGit(URL, requiredRevision, root)
 
-	return OhMyZsh{git: git}
+	omz := &OhMyZsh{git: git}
+	plugin := Plugin(omz)
+
+	return &plugin, nil
 }
 
-func MakeOhMyZshPlugin(ohMyZshInstance OhMyZsh, params map[string]string) (*Plugin, error) {
+func (p OhMyZsh) MakePlugin(_ string, params map[string]string) (*Plugin, error) {
 	plugin, pluginPrs := params["name"]
 	if !pluginPrs {
 		return nil, errors.New("missing plugin name")
 	}
 
-	ohMyZshPlugin := Plugin(ohMyZshInstance.LoadPlugin(plugin))
+	ohMyZshPlugin := Plugin(p.LoadPlugin(plugin))
 
 	return &ohMyZshPlugin, nil
 }
 
-func MakeOhMyZshTheme(ohMyZshInstance OhMyZsh, params map[string]string) (*Plugin, error) {
+func (p OhMyZsh) MakeTheme(_ string, params map[string]string) (*Plugin, error) {
 	theme, themePrs := params["name"]
 	if !themePrs {
 		return nil, errors.New("missing theme name")
 	}
 
-	ohMyZshTheme := Plugin(ohMyZshInstance.LoadTheme(theme))
+	ohMyZshTheme := Plugin(p.LoadTheme(theme))
 
 	return &ohMyZshTheme, nil
 }

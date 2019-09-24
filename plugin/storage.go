@@ -3,11 +3,15 @@ package plugin
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
+
+var ErrUnknownPluginType = errors.New("cannot parse the spec for an unknown plugin type")
 
 type pluginState int32
 
@@ -33,6 +37,23 @@ type pluginStorage struct {
 	LoadOrder []string
 }
 
+type loaderSpec struct {
+	loader func(string, map[string]string) (*Plugin, error)
+	regex  *regexp.Regexp
+}
+
+func (ls loaderSpec) matchAndLoad(root, spec string) (*Plugin, error) {
+	matches := ls.regex.FindStringSubmatch(spec)
+	if len(matches) == 0 {
+		return nil, nil
+	}
+	matchesDict := make(map[string]string)
+	for idx, match := range matches {
+		matchesDict[ls.regex.SubexpNames()[idx]] = match
+	}
+	return ls.loader(root, matchesDict)
+}
+
 func MakePluginStorage(
 	root string,
 	pluginSpecs []string,
@@ -42,54 +63,61 @@ func MakePluginStorage(
 	}
 
 	root = filepath.Join(root, "Plugins")
-	factory := &Factory{Root: root}
+
+	omzPlugin, _ := MakeOhMyZsh(root, map[string]string{})
+	omz := (*omzPlugin).(*OhMyZsh)
+	omzName := "oh-my-zsh"
+	ps.Plugins["oh-my-zsh"] = &pluginStorageEntry{
+		Name:        "oh-my-zsh",
+		Plugin:      *omzPlugin,
+		state:       pluginConfigLoaded,
+		errorState:  nil,
+		updateState: nil,
+	}
+
+	loaders := []loaderSpec{
+		{MakeGitHub, regexp.MustCompile(`^github\.com/(?P<username>[a-z0-9\-]+)/(?P<repo>[a-z0-9\-]+)(@(?P<version>.+))?$`)},
+		{MakeDir, regexp.MustCompile(`^dir://(?P<directory>.*)$`)},
+		{omz.MakePlugin, regexp.MustCompile(`^oh-my-zsh/plugin/(?P<name>[a-z0-9\-]+)$`)},
+		{omz.MakeTheme, regexp.MustCompile(`^oh-my-zsh/theme/(?P<name>[a-z0-9\-]+)$`)},
+		{MakeOhMyZsh, regexp.MustCompile(`^oh-my-zsh(@(?P<version>.+))?$`)},
+	}
 
 	for _, pluginSpec := range pluginSpecs {
-		p, isDependency, err := factory.MakePlugin(pluginSpec)
-		if err != nil {
-			msg := fmt.Sprintf("while loading plugin %s", pluginSpec)
-			return nil, errors.Wrap(err, msg)
-		}
+		loaded := false
+		for _, loader := range loaders {
+			plugin, err := loader.matchAndLoad(root, pluginSpec)
+			if err != nil {
+				return nil, errors.Wrap(err, "while loading a plugin")
+			}
+			if plugin != nil {
+				isOmz := strings.HasPrefix(pluginSpec, "oh-my-zsh")
 
-		pse := &pluginStorageEntry{
-			Name:        pluginSpec,
-			Plugin:      *p,
-			state:       pluginConfigLoaded,
-			errorState:  nil,
-			updateState: nil,
-		}
+				pse := &pluginStorageEntry{
+					Name:        pluginSpec,
+					Plugin:      *plugin,
+					state:       pluginConfigLoaded,
+					errorState:  nil,
+					updateState: nil,
+				}
+				ps.Plugins[pse.Name] = pse
 
-		// Oh My Zsh is required to be inserted in the beginning of the plugin
-		// load sequence.
-		if !isDependency {
-			ps.Plugins[pse.Name] = pse
-			ps.LoadOrder = append(ps.LoadOrder, pse.Name)
+				// Oh My Zsh is required to be inserted in the beginning of the plugin load sequence
+				if isOmz {
+					omzName = pluginSpec
+				} else {
+					ps.LoadOrder = append(ps.LoadOrder, pse.Name)
+				}
+				loaded = true
+				break
+			}
+		}
+		if !loaded {
+			return nil, ErrUnknownPluginType
 		}
 	}
 
-	factoryDependencies, factoryDependenciesSpecs := factory.Dependencies()
-	if factoryDependencies == nil {
-		return ps, nil
-	}
-
-	dependencies := make([]*pluginStorageEntry, 0, len(factoryDependencies))
-
-	for i, p := range factoryDependencies {
-		pse := &pluginStorageEntry{
-			Name:       factoryDependenciesSpecs[i],
-			Plugin:     p,
-			state:      pluginConfigLoaded,
-			errorState: nil,
-		}
-		dependencies = append(dependencies, pse)
-		ps.Plugins[pse.Name] = pse
-	}
-
-	dependenciesNames := make([]string, len(dependencies))
-	for i, pse := range dependencies {
-		dependenciesNames[i] = pse.Name
-	}
-	ps.LoadOrder = append(dependenciesNames, ps.LoadOrder...)
+	ps.LoadOrder = append([]string{omzName}, ps.LoadOrder...)
 
 	return ps, nil
 }
