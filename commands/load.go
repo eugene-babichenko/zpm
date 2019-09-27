@@ -48,8 +48,8 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "Load configured plugins into the current shell",
 	Run: func(cmd *cobra.Command, args []string) {
-		updateCheck := viper.GetBool("OnLoad.CheckForUpdates")
-		installMissing := viper.GetBool("OnLoad.InstallMissingPlugins")
+		updateCheck := viper.GetBool(configKeyOnLoadCheckForUpdates)
+		installMissing := viper.GetBool(configKeyOnLoadInstallMissingPlugins)
 
 		fpath := make([]string, 0)
 		exec := make([]string, 0)

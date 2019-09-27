@@ -9,20 +9,18 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
-// the default contents of ~/.zpm.yaml
-const yamlDefaultConfig = `
-LoggingLevel: info
-OnLoad:
-  CheckForUpdates: true
-  Completions: true
-  InstallMissingPlugins: true
-  UpdateCheckPeriod: 24h
-Plugins: []
-`
+const (
+	updateLink = "https://github.com/eugene-babichenko/zpm"
 
-const updateLink = "https://github.com/eugene-babichenko/zpm"
+	configKeyPlugins                     = "plugins"
+	configKeyLoggingLevel                = "logging_level"
+	configKeyOnLoadInstallMissingPlugins = "on_load.install_missing_plugins"
+	configKeyOnLoadCheckForUpdates       = "on_load.check_for_updates"
+	configKeyOnLoadUpdateCheckPeriod     = "on_load.update_check_period"
+)
 
 var (
 	Version string
@@ -83,11 +81,11 @@ func initConfig() {
 	viper.SetConfigName(".zpm")
 	viper.AddConfigPath("$HOME")
 
-	viper.SetDefault("Plugins", []string{})
-	viper.SetDefault("LoggingLevel", "info")
-	viper.SetDefault("OnLoad.InstallMissingPlugins", true)
-	viper.SetDefault("OnLoad.CheckForUpdates", true)
-	viper.SetDefault("OnLoad.UpdateCheckPeriod", "24h")
+	viper.SetDefault(configKeyPlugins, []string{})
+	viper.SetDefault(configKeyLoggingLevel, "info")
+	viper.SetDefault(configKeyOnLoadInstallMissingPlugins, true)
+	viper.SetDefault(configKeyOnLoadCheckForUpdates, true)
+	viper.SetDefault(configKeyOnLoadUpdateCheckPeriod, "24h")
 
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -105,22 +103,26 @@ func initConfig() {
 		}
 		// write defaults
 		configFilePath := filepath.Join(home, ".zpm.yaml")
-		// this is used to preserve uppercase letters which viper does not care about
-		if err := ioutil.WriteFile(configFilePath, []byte(yamlDefaultConfig), os.ModePerm); err != nil {
+		allSettings := viper.AllSettings()
+		allSettingsBytes, err := yaml.Marshal(allSettings)
+		if err != nil {
+			log.Fatalf("failed to serialize settings: %s", err)
+		}
+		if err := ioutil.WriteFile(configFilePath, allSettingsBytes, os.ModePerm); err != nil {
 			log.Fatalf("failed to write the default config to the drive: %s", err)
 		}
 	}
 
-	pluginsSpecs = viper.GetStringSlice("Plugins")
+	pluginsSpecs = viper.GetStringSlice(configKeyPlugins)
 
-	level, err := log.ParseLevel(viper.GetString("LoggingLevel"))
+	level, err := log.ParseLevel(viper.GetString(configKeyLoggingLevel))
 	if err != nil {
 		log.Errorf("failed to set the logging level: %s", err)
 	}
 
 	log.SetLevel(level)
 
-	updateCheckPeriod, err = time.ParseDuration(viper.GetString("OnLoad.UpdateCheckPeriod"))
+	updateCheckPeriod, err = time.ParseDuration(viper.GetString(configKeyOnLoadUpdateCheckPeriod))
 	if err != nil {
 		log.Fatalf("failed to parse OnLoad.UpdateCheckPeriod")
 	}

@@ -18,8 +18,7 @@ This tool was designed after seeing other plugin managers as slow or/and
 inconvenient. Primary design goals when developing this tool were:
 
 - Make it fast;
-- Allow to configure it with some conventional format (JSON and YAML are
-  supported);
+- Allow to configure it with some conventional format;
 - Keep `.zshrc` clean;
 - Be able to work with [Oh My Zsh][ohmyzsh] plugins;
 - Work with updates;
@@ -91,7 +90,7 @@ command.
 Here is an example configuration:
 
 ```yaml
-Plugins:
+plugins:
   - github.com/zsh-users/zsh-autosuggestions
   - github.com/mafredri/zsh-async
   - github.com/sindresorhus/pure
@@ -104,22 +103,9 @@ for `"oh-my-zsh"` plugin line (not for `"oh-my-zsh/plugin/*"` and
 `"oh-my-zsh/theme/*"`!):
 
 ```yaml
-Plugins:
+plugins:
   - github.com/marzocchi/zsh-notify@v1.0
   - oh-my-zsh@ea3e666e04bfae31b37ef42dfe54801484341e46
-```
-
-JSON is also possible:
-
-```json
-{
-  "Plugins": [
-    "github.com/zsh-users/zsh-autosuggestions",
-    "github.com/mafredri/zsh-async",
-    "github.com/sindresorhus/pure",
-    "oh-my-zsh/plugin/colored-man-pages"
-  ]
-}
 ```
 
 Possible patterns for adding the plugins are:
@@ -141,19 +127,19 @@ can run `zpm check` to check for updates without installing them.
 
 This section contains the list of available configuration keys.
 
-- `Plugins` (`[string]`) - the list of plugin specifications. The format for
+- `plugins` (`[string]`) - the list of plugin specifications. The format for
   specifications is described in [Configuring plugins](#configuring-plugins).
-- `LoggingLevel` (`string`) - logging level. Valid values are `debug`, `info`,
+- `logging_level` (`string`) - logging level. Valid values are `debug`, `info`,
   `error` and `fatal`. The default value is `info`.
-- `OnLoad.CheckForUpdates` (`bool`) - whether to check for updates a new shell
-  loads. This is done in the background and does not hit the performance. The
-  default value is `true`
-- `OnLoad.UpdateCheckPeriod` (`string`) defines the minimal period between the
-  updates checks that are run when a new shell loads (valid when
-  `OnLoad.CheckForUpdates` is set to `true`).Valid examples are `3h`, `30m`,
+- `on_load.check_for_updates` (`bool`) - whether to check for updates a new
+  shell loads. This is done in the background and does not hit the performance.
+  The default value is `true`.
+- `on_load.update_check_period` (`string`) defines the minimal period between
+  the updates checks that are run when a new shell loads (valid when
+  `on_load.check_for_updates` is set to `true`).Valid examples are `3h`, `30m`,
   `5h30m20s`. The default value `24h`.
-- `OnLoad.InstallMissingPlugins` (`bool`) - whether to install plugins, that are
-  specified in the config byt are not installed, when a new shell loads. The
+- `on_load.install_missing_plugins` (`bool`) - whether to install plugins, that
+  are specified in the config byt are not installed, when a new shell loads. The
   default value is `true`.
 
 ## Available commands
