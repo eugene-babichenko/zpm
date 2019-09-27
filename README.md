@@ -165,13 +165,9 @@ Run `zpm help` to get the full list of available commands and their flags.
 I appreciate any help! You can submit your questions, proposals and bugs found
 to the GitHub Issues.
 
-To build a project use `make` targets (see `Makefile`) rather than default Go
-commands. Note that this project requires [go-bindata] to build.
-
 [go-guide]: https://golang.org/doc/install
 [antigen]: https://github.com/zsh-users/antigen
 [antibody]: https://github.com/getantibody/antibody
 [ohmyzsh]: https://github.com/robbyrussell/oh-my-zsh
 [zsh]: https://sourceforge.net/projects/zsh/
-[go-bindata]: https://github.com/jteeuwen/go-bindata
 [latest-release]: https://github.com/eugene-babichenko/zpm/releases/latest

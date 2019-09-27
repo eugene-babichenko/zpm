@@ -1,14 +1,11 @@
-bindata:
-	go-bindata -pkg assets -o assets/assets.go config
-
-build: bindata
+build:
 	go build main.go
 
-run: bindata
+run:
 	go run main.go
 
-install: bindata
+install:
 	go install
 
-test: bindata
+test:
 	GO111MODULE=on go test -race -covermode=atomic -coverpkg=./... ./...

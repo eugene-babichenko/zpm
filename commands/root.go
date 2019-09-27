@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"github.com/eugene-babichenko/zpm/assets"
-
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,6 +10,17 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+// the default contents of ~/.zpm.yaml
+const yamlDefaultConfig = `
+LoggingLevel: info
+OnLoad:
+  CheckForUpdates: true
+  Completions: true
+  InstallMissingPlugins: true
+  UpdateCheckPeriod: 24h
+Plugins: []
+`
 
 const updateLink = "https://github.com/eugene-babichenko/zpm"
 
@@ -97,8 +106,7 @@ func initConfig() {
 		// write defaults
 		configFilePath := filepath.Join(home, ".zpm.yaml")
 		// this is used to preserve uppercase letters which viper does not care about
-		yamlConfig, _ := assets.Asset("config/.zpm.yaml")
-		if err := ioutil.WriteFile(configFilePath, yamlConfig, os.ModePerm); err != nil {
+		if err := ioutil.WriteFile(configFilePath, []byte(yamlDefaultConfig), os.ModePerm); err != nil {
 			log.Fatalf("failed to write the default config to the drive: %s", err)
 		}
 	}

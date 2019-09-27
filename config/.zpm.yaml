@@ -1,7 +1,0 @@
-LoggingLevel: info
-OnLoad:
-  CheckForUpdates: true
-  Completions: true
-  InstallMissingPlugins: true
-  UpdateCheckPeriod: 24h
-Plugins: []
