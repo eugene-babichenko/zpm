@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -84,36 +83,39 @@ func MakePluginStorage(
 	}
 
 	for _, pluginSpec := range pluginSpecs {
-		loaded := false
+		pse := &pluginStorageEntry{
+			Name:        pluginSpec,
+			Plugin:      nil,
+			state:       pluginConfigLoaded,
+			errorState:  nil,
+			updateState: nil,
+		}
+
 		for _, loader := range loaders {
 			plugin, err := loader.matchAndLoad(root, pluginSpec)
 			if err != nil {
 				return nil, errors.Wrap(err, "while loading a plugin")
 			}
-			if plugin != nil {
-				isOmz := strings.HasPrefix(pluginSpec, "oh-my-zsh")
-
-				pse := &pluginStorageEntry{
-					Name:        pluginSpec,
-					Plugin:      *plugin,
-					state:       pluginConfigLoaded,
-					errorState:  nil,
-					updateState: nil,
-				}
-				ps.Plugins[pse.Name] = pse
-
-				// Oh My Zsh is required to be inserted in the beginning of the plugin load sequence
-				if isOmz {
-					omzName = pluginSpec
-				} else {
-					ps.LoadOrder = append(ps.LoadOrder, pse.Name)
-				}
-				loaded = true
-				break
+			if plugin == nil {
+				continue
 			}
+
+			pse.Plugin = *plugin
+			ps.Plugins[pse.Name] = pse
+			break
 		}
-		if !loaded {
+
+		if pse.Plugin == nil {
 			return nil, ErrUnknownPluginType
+		}
+
+		_, isOmz := pse.Plugin.(*OhMyZsh)
+
+		// Oh My Zsh is required to be inserted in the beginning of the plugin load sequence
+		if isOmz {
+			omzName = pluginSpec
+		} else {
+			ps.LoadOrder = append(ps.LoadOrder, pluginSpec)
 		}
 	}
 
