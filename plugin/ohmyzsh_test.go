@@ -14,9 +14,9 @@ func TestOhMyZshLoadPlugin(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	require.Empty(t, err, "cannot create temp dir")
 
-	ohmyzsh := MakeOhMyZsh(tempDir, map[string]string{})
+	ohmyzsh, _ := MakeOhMyZsh(tempDir, map[string]string{})
 
-	plugin := ohmyzsh.LoadPlugin("cargo")
+	plugin := (*ohmyzsh).(*OhMyZsh).LoadPlugin("cargo")
 	expectedPath := filepath.Join(tempDir, "github.com/robbyrussell/oh-my-zsh/plugins/cargo")
 	assert.Equal(t, expectedPath, plugin.Path, "invalid plugin path")
 }
@@ -29,9 +29,9 @@ func TestMakeOhMyZshPlugin(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	require.Empty(t, err, "cannot create temp dir")
 
-	ohmyzsh := MakeOhMyZsh(tempDir, map[string]string{})
+	ohmyzsh, _ := MakeOhMyZsh(tempDir, map[string]string{})
 
-	plugin, err := MakeOhMyZshPlugin(ohmyzsh, map[string]string{"name": "cargo"})
+	plugin, err := (*ohmyzsh).(*OhMyZsh).MakePlugin(tempDir, map[string]string{"name": "cargo"})
 	assert.NotEmpty(t, plugin, "must return a plugin")
 	assert.Empty(t, err, "must not return an error")
 }
@@ -43,9 +43,9 @@ func TestMakeOhMyZshPluginNoName(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	require.Empty(t, err, "cannot create temp dir")
 
-	ohmyzsh := MakeOhMyZsh(tempDir, map[string]string{})
+	ohmyzsh, _ := MakeOhMyZsh(tempDir, map[string]string{})
 
-	_, err = MakeOhMyZshPlugin(ohmyzsh, map[string]string{})
+	_, err = (*ohmyzsh).(*OhMyZsh).MakePlugin(tempDir, map[string]string{})
 	assert.NotEmpty(t, err, "must return an error")
 }
 
@@ -57,9 +57,9 @@ func TestMakeOhMyZshTheme(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	require.Empty(t, err, "cannot create temp dir")
 
-	ohmyzsh := MakeOhMyZsh(tempDir, map[string]string{})
+	ohmyzsh, _ := MakeOhMyZsh(tempDir, map[string]string{})
 
-	plugin, err := MakeOhMyZshTheme(ohmyzsh, map[string]string{"name": "default"})
+	plugin, err := (*ohmyzsh).(*OhMyZsh).MakeTheme(tempDir, map[string]string{"name": "default"})
 	assert.NotEmpty(t, plugin, "must return a plugin")
 	assert.Empty(t, err, "must not return an error")
 }
@@ -71,8 +71,8 @@ func TestMakeOhMyZshThemeNoName(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "")
 	require.Empty(t, err, "cannot create temp dir")
 
-	ohmyzsh := MakeOhMyZsh(tempDir, map[string]string{})
+	ohmyzsh, _ := MakeOhMyZsh(tempDir, map[string]string{})
 
-	_, err = MakeOhMyZshTheme(ohmyzsh, map[string]string{})
+	_, err = (*ohmyzsh).(*OhMyZsh).MakeTheme(tempDir, map[string]string{})
 	assert.NotEmpty(t, err, "must return an error")
 }
