@@ -8,7 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
+	"text/template"
 	"time"
 
 	"github.com/pkg/errors"
@@ -16,6 +16,26 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+type loadScriptArgs struct {
+	FpathEntries []string
+	LoadFiles    []string
+}
+
+const loadScriptTemplate = `
+# Use different compdump for different zsh versions (kindly borrowed from Oh My Zsh).
+ZSH_COMPDUMP=${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}
+# initialize zsh completion system
+autoload -U compaudit compinit
+# load autocompletion scripts
+{{if .FpathEntries}}
+fpath=( {{range .FpathEntries}}{{.}} {{end}}$fpath )
+{{end}}
+compinit -u -C -d ${ZSH_COMPDUMP}
+# initialize plugins
+{{range .LoadFiles}}
+{{.}}{{end}}
+`
 
 func getLastUpdateTime() (t time.Time, err error) {
 	filename := filepath.Join(rootDir, ".lastupdate")
@@ -51,9 +71,6 @@ var loadCmd = &cobra.Command{
 		updateCheck := viper.GetBool(configKeyOnLoadCheckForUpdates)
 		installMissing := viper.GetBool(configKeyOnLoadInstallMissingPlugins)
 
-		fpath := make([]string, 0)
-		exec := make([]string, 0)
-
 		// Use different compdump for different zsh versions (kindly borrowed from Oh My Zsh).
 		fmt.Println("ZSH_COMPDUMP=\"${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}\"")
 		// initialize zsh completion system
@@ -79,6 +96,8 @@ var loadCmd = &cobra.Command{
 			ps.InstallAll()
 		}
 
+		pluginLoadData := loadScriptArgs{}
+
 		// plugin load order must be preserved because of dependencies between them
 		for _, name := range ps.LoadOrder {
 			pse := ps.Plugins[name]
@@ -87,24 +106,16 @@ var loadCmd = &cobra.Command{
 				log.Errorf("while loading plugin %s: %s", pse.Name, err)
 				continue
 			}
-			fpath = append(fpath, fpathPlugin...)
-			exec = append(exec, execPlugin...)
+			pluginLoadData.FpathEntries = append(pluginLoadData.FpathEntries, fpathPlugin...)
+			pluginLoadData.LoadFiles = append(pluginLoadData.LoadFiles, execPlugin...)
 		}
 
-		// build fpath: it contains paths to files with zsh functions
-		// definitions including completions
-		var fpathBuilder strings.Builder
-		_, _ = fmt.Fprint(&fpathBuilder, "fpath=(")
-		for _, fpathEntry := range fpath {
-			_, _ = fmt.Fprintf(&fpathBuilder, "%s ", fpathEntry)
+		tmpl, err := template.New("load").Parse(loadScriptTemplate)
+		if err != nil {
+			log.Fatalf("failed to parse the loader template: %s", err)
 		}
-		_, _ = fmt.Fprint(&fpathBuilder, "$fpath)")
-
-		// Load completions from `fpath`.
-		fmt.Println(fpathBuilder.String())
-		fmt.Println("compinit -u -C -d \"${ZSH_COMPDUMP}\"")
-		for _, execLine := range exec {
-			fmt.Println(execLine)
+		if err := tmpl.Execute(os.Stdout, pluginLoadData); err != nil {
+			log.Fatalf("failed to execute the loader template: %s", err)
 		}
 
 		if !updateCheck {
