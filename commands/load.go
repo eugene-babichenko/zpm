@@ -22,9 +22,34 @@ type loadScriptArgs struct {
 	LoadFiles    []string
 }
 
+// Note the part I took from Oh My Zsh
+//Copyright (c) 2009-2019 Robby Russell and contributors
+//See the full list at https://github.com/robbyrussell/oh-my-zsh/contributors
+//
+//Permission is hereby granted, free of charge, to any person obtaining a copy
+//of this software and associated documentation files (the "Software"), to deal
+//in the Software without restriction, including without limitation the rights
+//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//copies of the Software, and to permit persons to whom the Software is
+//furnished to do so, subject to the following conditions:
+//
+//The above copyright notice and this permission notice shall be included in all
+//copies or substantial portions of the Software.
+
 const loadScriptTemplate = `
-# Use different compdump for different zsh versions (kindly borrowed from Oh My Zsh).
+### TAKEN FROM OH MY ZSH
+
+# Figure out the SHORT hostname
+if [[ "$OSTYPE" = darwin* ]]; then
+  # macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
+  SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST=${HOST/.*/}
+else
+  SHORT_HOST=${HOST/.*/}
+fi
 ZSH_COMPDUMP=${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}
+
+### TAKEN FROM OH MY ZSH
+
 # initialize zsh completion system
 autoload -U compaudit compinit
 # load autocompletion scripts
