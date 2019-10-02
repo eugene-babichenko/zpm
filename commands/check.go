@@ -7,11 +7,23 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/go-github/github"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+func showVersionUpdateGuide(currentVersion string) {
+	if cmp := strings.Compare(currentVersion, Version); cmp > 0 {
+		log.Infof("zpm update available: newer version %s, current version %s", currentVersion, Version)
+		log.Infof("to download the update go to %s", updateLink)
+	}
+	// "-" can appear in generated version numbers or in versions like v0.2.1-beta.1
+	if strings.Contains(Version, "-") {
+		log.Warnf("Be careful! You are running a possibly unstable version %s", Version)
+	}
+}
 
 var checkCmd = &cobra.Command{
 	Use:   "check",
@@ -35,10 +47,7 @@ var checkCmd = &cobra.Command{
 		releaseTag := *(release.TagName)
 		releaseTag = releaseTag[1:]
 
-		if releaseTag != Version {
-			log.Infof("zpm update available: newer version %s, current version %s", releaseTag, Version)
-			log.Infof("to download the update go to %s", updateLink)
-		}
+		showVersionUpdateGuide(releaseTag)
 
 		if err := ioutil.WriteFile(filepath.Join(rootDir, ".github_version"), []byte(releaseTag), os.ModePerm); err != nil {
 			log.Fatalf("failed to write .github_version: %s", err)
