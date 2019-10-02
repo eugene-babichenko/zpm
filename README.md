@@ -4,7 +4,6 @@
 
 [![Latest Release](https://img.shields.io/github/release/eugene-babichenko/zpm.svg?style=flat-square)][latest-release]
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://img.shields.io/badge/license-MIT-brightgreen.svg)
-[![Build Status](https://travis-ci.org/eugene-babichenko/zpm.svg?branch=master)](https://travis-ci.org/eugene-babichenko/zpm)
 [![Codecov](https://img.shields.io/codecov/c/github/eugene-babichenko/zpm/master.svg?style=flat-square)](https://codecov.io/gh/eugene-babichenko/zpm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/eugene-babichenko/zpm)](https://goreportcard.com/report/github.com/eugene-babichenko/zpm)
 [![Powered by: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=flat-square)](https://github.com/goreleaser)
