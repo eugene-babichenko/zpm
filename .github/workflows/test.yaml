@@ -1,0 +1,42 @@
+name: Tests
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12
+        id: go
+      - name: git checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Install golangci-lint
+        run: curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s v1.17.1
+      - name: Lint
+        run: ./bin/golangci-lint run
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.12
+        id: go
+      - name: git checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Run tests
+        run: GO111MODULE=on go test -race -coverprofile=coverage.txt -covermode=atomic -coverpkg=./... ./...
+      - name: Upload coverage info
+        run: bash <(curl -s https://codecov.io/bash)
+
