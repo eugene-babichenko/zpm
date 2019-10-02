@@ -19,7 +19,7 @@ func MakeGitHub(root string, params map[string]string) (*Plugin, error) {
 		return nil, errors.New("missing repo")
 	}
 
-	requiredRevision, _ := params["version"]
+	requiredRevision := params["version"]
 	if requiredRevision == "" {
 		requiredRevision = "master"
 	}

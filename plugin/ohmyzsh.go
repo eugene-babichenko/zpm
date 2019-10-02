@@ -13,7 +13,7 @@ type OhMyZsh struct {
 }
 
 func MakeOhMyZsh(root string, params map[string]string) (*Plugin, error) {
-	requiredRevision, _ := params["version"]
+	requiredRevision := params["version"]
 	if requiredRevision == "" {
 		requiredRevision = "master"
 	}
