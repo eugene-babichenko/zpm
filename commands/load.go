@@ -61,7 +61,9 @@ compinit -u -C -d ${ZSH_COMPDUMP}
 {{range .LoadFiles}}
 {{.}}{{end}}
 
-ZPM_BINARY=$(which zpm)
+if [ -z "$ZPM_BINARY" ]; then
+	ZPM_BINARY=$(which zpm)
+fi
 zpm () {
 	$ZPM_BINARY $@
 	if [ "$1" = "update" ] || [ "$1" = "install" ]; then
