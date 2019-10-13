@@ -245,3 +245,23 @@ func (ps *pluginStorage) InstallAll() {
 	}
 	waitGroup.Wait()
 }
+
+func (ps pluginStorage) HasUpdates() bool {
+	for _, pse := range ps.Plugins {
+		if pse.state == pluginNeedUpdate {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (ps pluginStorage) HasInstalls() bool {
+	for _, pse := range ps.Plugins {
+		if pse.state == pluginNeedInstall {
+			return true
+		}
+	}
+
+	return false
+}

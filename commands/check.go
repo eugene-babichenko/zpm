@@ -38,6 +38,14 @@ var checkCmd = &cobra.Command{
 
 		ps.CheckPluginUpdates(false)
 
+		if ps.HasUpdates() {
+			log.Info("To install updates, run `zpm update`")
+		}
+
+		if ps.HasInstalls() {
+			log.Info("To install new plugins, run `zpm install`")
+		}
+
 		githubClient := github.NewClient(nil)
 		release, _, err := githubClient.Repositories.GetLatestRelease(context.Background(), "eugene-babichenko", "zpm")
 		if err != nil {

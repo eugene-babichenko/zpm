@@ -118,6 +118,14 @@ var loadCmd = &cobra.Command{
 			ps.InstallAll()
 		}
 
+		if ps.HasUpdates() {
+			log.Info("To install updates, run `zpm update`")
+		}
+
+		if ps.HasInstalls() {
+			log.Info("To install new plugins, run `zpm install`")
+		}
+
 		pluginLoadData := loadScriptArgs{}
 
 		// plugin load order must be preserved because of dependencies between them
