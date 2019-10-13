@@ -41,10 +41,10 @@ const loadScriptTemplate = `
 
 # Figure out the SHORT hostname
 if [[ "$OSTYPE" = darwin* ]]; then
-  # macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
-  SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST=${HOST/.*/}
+	# macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
+	SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST=${HOST/.*/}
 else
-  SHORT_HOST=${HOST/.*/}
+	SHORT_HOST=${HOST/.*/}
 fi
 ZSH_COMPDUMP=${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}
 
@@ -60,6 +60,15 @@ compinit -u -C -d ${ZSH_COMPDUMP}
 # initialize plugins
 {{range .LoadFiles}}
 {{.}}{{end}}
+
+ZPM_BINARY=$(which zpm)
+zpm () {
+	$ZPM_BINARY $@
+	if [ "$1" = "update" ] || [ "$1" = "install" ]; then
+		echo "zpm: Loading updates..."
+		source <($ZPM_BINARY load)
+	fi
+}
 `
 
 func getLastUpdateTime() (t time.Time, err error) {
