@@ -66,20 +66,27 @@ func MakePluginStorage(
 	omzPlugin, _ := MakeOhMyZsh(root, map[string]string{})
 	omz := (*omzPlugin).(*OhMyZsh)
 	omzName := "oh-my-zsh"
-	ps.Plugins["oh-my-zsh"] = &pluginStorageEntry{
-		Name:        "oh-my-zsh",
-		Plugin:      *omzPlugin,
-		state:       pluginConfigLoaded,
-		errorState:  nil,
-		updateState: nil,
+	omzRequired := false
+
+	omzMakePlugin := func(root string, params map[string]string) (*Plugin, error) {
+		omzRequired = true
+		return omz.MakePlugin(root, params)
+	}
+	omzMakeTheme := func(root string, params map[string]string) (*Plugin, error) {
+		omzRequired = true
+		return omz.MakeTheme(root, params)
+	}
+	omzMakeOhMyZsh := func(root string, params map[string]string) (*Plugin, error) {
+		omzRequired = true
+		return MakeOhMyZsh(root, params)
 	}
 
 	loaders := []loaderSpec{
 		{MakeGitHub, regexp.MustCompile(`^github\.com/(?P<username>[a-z0-9\-]+)/(?P<repo>[a-z0-9\-]+)(@(?P<version>.+))?$`)},
 		{MakeDir, regexp.MustCompile(`^dir://(?P<directory>.*)$`)},
-		{omz.MakePlugin, regexp.MustCompile(`^oh-my-zsh/plugin/(?P<name>[a-z0-9\-]+)$`)},
-		{omz.MakeTheme, regexp.MustCompile(`^oh-my-zsh/theme/(?P<name>[a-z0-9\-]+)$`)},
-		{MakeOhMyZsh, regexp.MustCompile(`^oh-my-zsh(@(?P<version>.+))?$`)},
+		{omzMakePlugin, regexp.MustCompile(`^oh-my-zsh/plugin/(?P<name>[a-z0-9\-]+)$`)},
+		{omzMakeTheme, regexp.MustCompile(`^oh-my-zsh/theme/(?P<name>[a-z0-9\-]+)$`)},
+		{omzMakeOhMyZsh, regexp.MustCompile(`^oh-my-zsh(@(?P<version>.+))?$`)},
 	}
 
 	for _, pluginSpec := range pluginSpecs {
@@ -119,7 +126,16 @@ func MakePluginStorage(
 		}
 	}
 
-	ps.LoadOrder = append([]string{omzName}, ps.LoadOrder...)
+	if omzRequired {
+		ps.Plugins[omzName] = &pluginStorageEntry{
+			Name:        "oh-my-zsh",
+			Plugin:      *omzPlugin,
+			state:       pluginConfigLoaded,
+			errorState:  nil,
+			updateState: nil,
+		}
+		ps.LoadOrder = append([]string{omzName}, ps.LoadOrder...)
+	}
 
 	return ps, nil
 }
