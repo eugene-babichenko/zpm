@@ -30,6 +30,7 @@ This project is largely influenced by [Antigen][antigen] and
 
 - [Installation](#installation)
   - [On macOS](#on-macos)
+  - [On Linux (snap)](#on-linux-snap)
   - [On Linux](#on-linux)
   - [From source](#from-source-any-platform)
 - [Getting Started](#getting-started)
@@ -45,6 +46,19 @@ This project is largely influenced by [Antigen][antigen] and
 ### On macOS
 
 On macOS you can use Homebrew: `brew install eugene-babichenko/tap/zpm`
+
+### On Linux (`snap`)
+
+> Snap is installed out of the box on Ubuntu and its derivatives. See
+> [installation guides][snap-install] for other distributions.
+
+If you have `snap` installed (it is installed out of the box on Ubuntu and its
+derivatives), you can install `.zpm` as follows:
+
+```bash
+snap install zpm
+snap connect zpm:config-file
+```
 
 ### On Linux
 
@@ -156,3 +170,4 @@ to the GitHub Issues.
 [ohmyzsh]: https://github.com/robbyrussell/oh-my-zsh
 [zsh]: https://sourceforge.net/projects/zsh/
 [latest-release]: https://github.com/eugene-babichenko/zpm/releases/latest
+[snap-install]: https://snapcraft.io/docs/installing-snapd

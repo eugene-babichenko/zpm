@@ -34,6 +34,29 @@ brews:
     name: homebrew-tap
   homepage: https://github.com/eugene-babichenko/zpm
   description: Simple and fast zsh plugins manager
+snapcrafts:
+- id: zpm
+  builds:
+  - zpm
+  name: zpm
+  summary: Simple and fast zsh plugins manager
+  description: Simple and fast zsh plugins manager
+  grade: stable
+  confinement: strict
+  license: MIT
+  base: bare
+  apps:
+    zpm:
+      plugs: ["network", "zpm-files"]
+  plugs:
+    zpm-files:
+      interface: personal-files
+      read:
+      - $HOME/.zpm.yaml
+      - $HOME/.zpm_plugins
+      write:
+      - $HOME/.zpm.yaml
+      - $HOME/.zpm_plugins
 checksum:
   name_template: 'checksums.txt'
 snapshot:

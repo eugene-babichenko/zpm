@@ -68,6 +68,25 @@ func (prefixedWriter) Write(p []byte) (n int, err error) {
 	return nPrefix + np, err
 }
 
+func getHomeDir() (string, error) {
+	// check if we are running inside of a snapcraft package
+	if _, isSnap := os.LookupEnv("SNAP_NAME"); isSnap {
+		// $HOME for snapcraft packages is not equal to the user homedir path,
+		// so we build a path according to filesystem hierarchy standard (FHS)
+		username := os.Getenv("USER")
+		if username == "root" {
+			return "/root", nil
+		}
+		return filepath.Join("/home", username), nil
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return home, nil
+}
+
 func initConfig() {
 	formatter := &log.TextFormatter{}
 	formatter.DisableLevelTruncation = true
@@ -87,10 +106,7 @@ func initConfig() {
 	viper.SetDefault(configKeyOnLoadCheckForUpdates, true)
 	viper.SetDefault(configKeyOnLoadUpdateCheckPeriod, "24h")
 
-	home, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatalf("failed to get system root directory: %s", err)
-	}
+	home, err := getHomeDir()
 	rootDir = filepath.Join(home, ".zpm_plugins")
 
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil && !os.IsExist(err) {
