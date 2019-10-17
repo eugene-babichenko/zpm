@@ -16,13 +16,13 @@ import (
 
 func showVersionUpdateGuide(currentVersion string) {
 	if cmp := strings.Compare(currentVersion, Version); cmp > 0 {
-		log.Infof("zpm update available: newer version %s, current version %s", currentVersion, Version)
-		log.Infof("to download the update go to %s", updateLink)
+		log.Warnf("zpm update available: newer version %s, current version %s", currentVersion, Version)
 	}
 	// "-" can appear in generated version numbers or in versions like v0.2.1-beta.1
-	if strings.Contains(Version, "-") {
+	if strings.Contains(Version, "-") || Version == "dev" {
 		log.Warnf("Be careful! You are running a possibly unstable version %s", Version)
 	}
+	log.Infof("to download the latest stable version, go to %s", updateLink)
 }
 
 var checkCmd = &cobra.Command{
