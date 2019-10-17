@@ -17,10 +17,11 @@ import (
 func showVersionUpdateGuide(currentVersion string) {
 	if cmp := strings.Compare(currentVersion, Version); cmp > 0 {
 		log.Warnf("zpm update available: newer version %s, current version %s", currentVersion, Version)
-	}
-	// "-" can appear in generated version numbers or in versions like v0.2.1-beta.1
-	if strings.Contains(Version, "-") || Version == "dev" {
+	} else if strings.Contains(Version, "-") || Version == "dev" {
+		// "-" can appear in generated version numbers or in versions like v0.2.1-beta.1
 		log.Warnf("Be careful! You are running a possibly unstable version %s", Version)
+	} else {
+		return
 	}
 	log.Infof("to download the latest stable version, go to %s", updateLink)
 }
