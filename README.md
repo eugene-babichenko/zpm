@@ -30,7 +30,6 @@ This project is largely influenced by [Antigen][antigen] and
 
 - [Installation](#installation)
   - [On macOS](#on-macos)
-  - [On Linux (snap)](#on-linux-snap)
   - [On Linux](#on-linux)
   - [From source](#from-source-any-platform)
 - [Getting Started](#getting-started)
@@ -47,19 +46,6 @@ This project is largely influenced by [Antigen][antigen] and
 
 On macOS you can use Homebrew: `brew install eugene-babichenko/tap/zpm`
 
-### On Linux (`snap`)
-
-> Snap is installed out of the box on Ubuntu and its derivatives. See
-> [installation guides][snap-install] for other distributions.
-
-If you have `snap` installed (it is installed out of the box on Ubuntu and its
-derivatives), you can install `.zpm` as follows:
-
-```bash
-snap install zpm
-snap connect zpm:config-file
-```
-
 ### On Linux
 
 Go to the [Releases][latest-release] section and download a binary or a
@@ -72,11 +58,16 @@ Packages can be installed with:
 
 ### From source (any platform)
 
-You will need `go` 1.12 to build this project, so please install it and
-configure Go environment variables. You can follow
+You will need `go` 1.12 or higher to build this project, so please install it
+and configure Go environment variables. You can follow
 [the official guide][go-guide].
 
-Then run `go get -u github.com/eugene-babichenko/zpm`.
+- Download this repository:
+  `git clone https://github.com/eugene-babichenko/zpm.git`
+- Go to the repository directory: `cd zpm`
+- Checkout the latest stable version: `git checkout v0.3.0`
+- Run `make install`. This is required to set the correct version inside the
+  app.
 
 ## Getting Started
 
